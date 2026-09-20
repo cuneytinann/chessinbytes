@@ -4,7 +4,7 @@
 
 A two-player chess game in **1,023 bytes** of HTML + JavaScript. One file, no libraries, no build step, no server. Download `index.html`, double-click, play.
 
-A reduced build, `minimum.html`, keeps the same rules in **831 bytes** and drops most of the interface.
+A reduced build, `minimum.html`, keeps the same rules in **830 bytes** and drops most of the interface.
 
 Part of the [Golfstack](https://www.fidelite.art/) project.
 
@@ -12,8 +12,8 @@ Part of the [Golfstack](https://www.fidelite.art/) project.
 
 - [cuneytinann.github.io/chess1023byte](https://cuneytinann.github.io/chess1023byte/) — `index.html`
 - [cuneytinann.github.io/chess1023byte/minimum.html](https://cuneytinann.github.io/chess1023byte/minimum.html) — `minimum.html`
-- [fidelite.art/special/L1/DOM_1023.html](https://www.fidelite.art/special/L1/DOM_1023.html) — same file as `index.html`, mirrored on the project site as the packed `L1` build
-- [fidelite.art/special/L1/DOM_minimum.html](https://www.fidelite.art/special/L1/DOM_minimum.html) — same file as `minimum.html`
+- [fidelite.art/special/DOM_1023.html](https://www.fidelite.art/special/DOM_1023.html) — same file as `index.html`, mirrored on the project site as the packed `L1` build
+- [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — same file as `minimum.html`
 
 The name of the budget: 1,024 bytes. This lands 1 byte under it.
 
@@ -57,10 +57,10 @@ The same rule set with the interface cut back to what is needed to play.
 | file | size | what |
 | ---- | ---- | ---- |
 | `index.html` | 1,023 B | the game, packed and playable |
-| `chess.js` | 1,165 B | its plain source, one line, unpacked |
-| `minimum.html` | 831 B | the reduced build, packed and playable |
+| `chess.js` | 1,164 B | its plain source, one line, unpacked |
+| `minimum.html` | 830 B | the reduced build, packed and playable |
 | `minimum.js` | 867 B | its plain source, one line, unpacked |
-| `pack.js` | 1,584 B | rebuilds both HTML files from the sources and checks them byte for byte |
+| `pack.js` | 1,588 B | rebuilds both HTML files from the sources and checks them byte for byte |
 
 ## Unpacking
 
@@ -79,8 +79,8 @@ The loop itself runs no game code, so this is safe to do in Node. `chess.js` and
 | option | `index.html` | `minimum.html` |
 | ------ | ------------ | -------------- |
 | `reassignVars` | `false` | `false` |
-| `crushGainFactor` | `0` | `1` |
-| `crushLengthFactor` | `0` | `0` |
+| `crushGainFactor` | `1` | `0.5` |
+| `crushLengthFactor` | `0.5` | `0` |
 | `crushCopiesFactor` | `0` | `1` |
 | `crushTiebreakerFactor` | `0` | `0` |
 | `withMath` | `false` | `false` |
@@ -91,10 +91,10 @@ In both, the winning stage is 2, the regexp character class. Byte layout:
 
 ```
 28 B  <center><table id=T><script>        32 B  <input id=p><table id=T><script>
-986 B  packed payload                     790 B  packed payload
+986 B  packed payload                     789 B  packed payload
  9 B  </script>                            9 B  </script>
 ----                                      ----
-1023 B                                    831 B
+1023 B                                    830 B
 ```
 
 To rebuild:
@@ -107,7 +107,7 @@ node pack.js            # rewrite index.html and minimum.html
 
 With the `regpack` command line, pass `--no-reassignVars`. Written as `--reassignVars false`, the value arrives as the string `"false"`, which counts as true, and the variables get renamed.
 
-Only the script is packed; the HTML shell is not. Note that shortening the source does **not** reliably shorten the output — the packer pays for repeated substrings, so a longer source with more repetition often packs smaller. Several edits in `index.html` are deliberately longer than they need to be for exactly that reason. Of the behaviour-preserving rewrites tried on `chess.js`, none packed smaller and two packed larger, one of them by six bytes; in `minimum.js`, replacing `o%5==1` with `66>>o` saved exactly one byte.
+Only the script is packed; the HTML shell is not. Note that shortening the source does **not** reliably shorten the output — the packer pays for repeated substrings, so a longer source with more repetition often packs smaller. Several edits in `index.html` are deliberately longer than they need to be for exactly that reason. Of the behaviour-preserving rewrites tried on `chess.js`, none packed smaller and two packed larger, one of them by six bytes. Two later ones say the same thing from both sides. Writing `66>>j` instead of `j%5==1` shortens the source by a byte and lengthens the packed output by one — it only comes back to 1,023 with a different crush tuple, which is why the table above no longer reads `0, 0, 0, 0`. Replacing `p%2^g` with `p&1^g` costs nothing in the source and **two bytes** in the output, and no setting recovers them; it was not taken. In `minimum.js` the same substitution on `b[f]%2^t` went the other way and saved one byte, and `o%5==1` → `66>>o` had saved one before it.
 
 ---
 
@@ -138,7 +138,7 @@ The engine's design, the full rule coverage and a line-by-line walkthrough of th
 
 HTML + JavaScript ile **1.023 bayt** içinde yazılmış iki kişilik bir satranç oyunu. Tek dosya, kütüphane yok, derleme adımı yok, sunucu yok. `index.html` dosyasını indirin, çift tıklayın, oynayın.
 
-Sadeleştirilmiş sürüm `minimum.html`, aynı kuralları **831 bayt** içinde tutar ve arayüzün çoğunu çıkarır.
+Sadeleştirilmiş sürüm `minimum.html`, aynı kuralları **830 bayt** içinde tutar ve arayüzün çoğunu çıkarır.
 
 [Golfstack](https://www.fidelite.art/) projesinin bir parçasıdır.
 
@@ -146,8 +146,8 @@ Sadeleştirilmiş sürüm `minimum.html`, aynı kuralları **831 bayt** içinde 
 
 - [cuneytinann.github.io/chess1023byte](https://cuneytinann.github.io/chess1023byte/) — `index.html`
 - [cuneytinann.github.io/chess1023byte/minimum.html](https://cuneytinann.github.io/chess1023byte/minimum.html) — `minimum.html`
-- [fidelite.art/special/L1/DOM_1023.html](https://www.fidelite.art/special/L1/DOM_1023.html) — `index.html` ile aynı dosya, proje sitesinde paketlenmiş `L1` sürümü olarak yansıtılmış hâli
-- [fidelite.art/special/L1/DOM_minimum.html](https://www.fidelite.art/special/L1/DOM_minimum.html) — `minimum.html` ile aynı dosya
+- [fidelite.art/special/DOM_1023.html](https://www.fidelite.art/special/DOM_1023.html) — `index.html` ile aynı dosya, proje sitesinde paketlenmiş `L1` sürümü olarak yansıtılmış hâli
+- [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — `minimum.html` ile aynı dosya
 
 Hedeflenen sınır 1.024 bayt; bu sürüm onun 1 bayt altında kalıyor.
 
@@ -191,10 +191,10 @@ Aynı kural seti; arayüz, oynamak için gerekene kadar kısılmış.
 | dosya | boyut | ne |
 | ----- | ----- | -- |
 | `index.html` | 1.023 B | oyun, paketlenmiş ve oynanabilir |
-| `chess.js` | 1.165 B | paketlenmemiş kaynak kodu, tek satır |
-| `minimum.html` | 831 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
+| `chess.js` | 1.164 B | paketlenmemiş kaynak kodu, tek satır |
+| `minimum.html` | 830 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
 | `minimum.js` | 867 B | paketlenmemiş kaynak kodu, tek satır |
-| `pack.js` | 1.584 B | iki HTML dosyasını kaynaklardan yeniden üretir ve bayt bayt karşılaştırır |
+| `pack.js` | 1.588 B | iki HTML dosyasını kaynaklardan yeniden üretir ve bayt bayt karşılaştırır |
 
 ## Paketi açma
 
@@ -213,8 +213,8 @@ Döngünün kendisi hiçbir oyun kodu çalıştırmaz, bu yüzden bunu Node'da y
 | seçenek | `index.html` | `minimum.html` |
 | ------- | ------------ | -------------- |
 | `reassignVars` | `false` | `false` |
-| `crushGainFactor` | `0` | `1` |
-| `crushLengthFactor` | `0` | `0` |
+| `crushGainFactor` | `1` | `0.5` |
+| `crushLengthFactor` | `0.5` | `0` |
 | `crushCopiesFactor` | `0` | `1` |
 | `crushTiebreakerFactor` | `0` | `0` |
 | `withMath` | `false` | `false` |
@@ -225,10 +225,10 @@ Döngünün kendisi hiçbir oyun kodu çalıştırmaz, bu yüzden bunu Node'da y
 
 ```
 28 B  <center><table id=T><script>        32 B  <input id=p><table id=T><script>
-986 B  paketlenmiş yük                    790 B  paketlenmiş yük
+986 B  paketlenmiş yük                    789 B  paketlenmiş yük
  9 B  </script>                            9 B  </script>
 ----                                      ----
-1023 B                                    831 B
+1023 B                                    830 B
 ```
 
 Yeniden üretmek için:
@@ -241,7 +241,7 @@ node pack.js            # index.html ve minimum.html dosyalarını yeniden yazar
 
 `regpack` komut satırını kullanıyorsanız `--no-reassignVars` yazın. `--reassignVars false` biçiminde yazılan değer `"false"` metni olarak gelir, doğru sayılır ve değişkenler yeniden adlandırılır.
 
-Yalnızca betik paketlenir; HTML kabuğu paketlenmez. Şunu not edin: kaynağı kısaltmak çıktıyı **güvenilir biçimde kısaltmaz** — paketleyici kazancını tekrar eden alt dizelerden elde eder, bu yüzden daha çok tekrar içeren daha uzun bir kaynak çoğu zaman daha küçük paketlenir. `index.html`'deki bazı düzenlemeler tam da bu nedenle, gerekenden bilerek daha uzun tutulmuştur. `chess.js` üzerinde denenen, davranışı değiştirmeyen yeniden yazımların hiçbiri daha küçük paketlenmedi, ikisi büyüttü, biri altı bayt; `minimum.js`'te `o%5==1` yerine `66>>o` yazmak tam bir bayt kazandırdı.
+Yalnızca betik paketlenir; HTML kabuğu paketlenmez. Şunu not edin: kaynağı kısaltmak çıktıyı **güvenilir biçimde kısaltmaz** — paketleyici kazancını tekrar eden alt dizelerden elde eder, bu yüzden daha çok tekrar içeren daha uzun bir kaynak çoğu zaman daha küçük paketlenir. `index.html`'deki bazı düzenlemeler tam da bu nedenle, gerekenden bilerek daha uzun tutulmuştur. `chess.js` üzerinde denenen, davranışı değiştirmeyen yeniden yazımların hiçbiri daha küçük paketlenmedi, ikisi büyüttü, biri altı bayt. Sonradan gelen iki tanesi aynı şeyi iki yönden söylüyor. `j%5==1` yerine `66>>j` yazmak kaynağı bir bayt kısaltıp paketi bir bayt uzatıyor — 1.023'e ancak başka bir crush dörtlüsüyle dönüyor, yukarıdaki tablonun artık `0, 0, 0, 0` olmamasının sebebi bu. `p%2^g` yerine `p&1^g` yazmak kaynakta hiçbir şeye mal olmuyor, çıktıda **iki bayta**, ve hiçbir ayar onu geri almıyor; alınmadı. `minimum.js`'te aynı değişiklik `b[f]%2^t` üzerinde ters yönde işledi ve bir bayt kazandırdı, ondan önce de `o%5==1` → `66>>o` bir bayt kazandırmıştı.
 
 ---
 

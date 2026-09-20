@@ -8,8 +8,8 @@ const fs = require('fs');
 const { cmdRegPack } = require('regpack');
 
 const BUILDS = [
-  { src: 'chess.js',   out: 'index.html',   head: '<center><table id=T><script>', crush: [0, 0, 0, 0] },
-  { src: 'minimum.js', out: 'minimum.html', head: '<input id=p><table id=T><script>', crush: [1, 0, 1, 0] },
+  { src: 'chess.js',   out: 'index.html',   head: '<center><table id=T><script>', crush: [1, 0.5, 1, 0] },
+  { src: 'minimum.js', out: 'minimum.html', head: '<input id=p><table id=T><script>', crush: [0.5, 0, 1, 0] },
 ];
 
 const check = process.argv.includes('--check');
