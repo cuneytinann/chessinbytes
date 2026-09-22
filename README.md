@@ -1,27 +1,36 @@
-**[English](#chess1023byte)** · **[Türkçe](#turkce)**
+**[English](#chessinbytes)** · **[Türkçe](#turkce)**
 
-# chess1023byte
+# chessinbytes
 
-A two-player chess game in **1,023 bytes** of HTML + JavaScript. One file, no libraries, no build step, no server. Download `index.html`, double-click, play.
+Two-player chess in bytes. Three builds, each a single HTML file under 1 KB: no libraries, no build step, no server. Download one, double-click, play.
 
-A reduced build, `minimum.html`, keeps the same rules in **830 bytes** and drops most of the interface.
+| file | size | how it plays |
+| ---- | ---- | ------------ |
+| `index.html` | **1,023 B** | click the board; piece glyphs, board flip, promotion picker |
+| `minimal.html` | **830 B** | click the board; pieces shown as hexadecimal digits |
+| `Lowest.html` | **766 B** | type moves as numbers into a dialog; no board at all |
+
+All three enforce the same rules: full legality, castling with every condition, en passant, promotion to any piece.
 
 Part of the [Golfstack](https://www.fidelite.art/) project.
 
 ## Play
 
-- [cuneytinann.github.io/chess1023byte](https://cuneytinann.github.io/chess1023byte/) — `index.html`
-- [cuneytinann.github.io/chess1023byte/minimum.html](https://cuneytinann.github.io/chess1023byte/minimum.html) — `minimum.html`
+- [cuneytinann.github.io/chessinbytes](https://cuneytinann.github.io/chessinbytes/) — `index.html`
+- [cuneytinann.github.io/chessinbytes/minimal.html](https://cuneytinann.github.io/chessinbytes/minimal.html) — `minimal.html`
+- [cuneytinann.github.io/chessinbytes/Lowest.html](https://cuneytinann.github.io/chessinbytes/Lowest.html) — `Lowest.html`
 - [fidelite.art/special/DOM_1023.html](https://www.fidelite.art/special/DOM_1023.html) — same file as `index.html`, mirrored on the project site as the packed `L1` build
-- [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — same file as `minimum.html`
+- [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — same file as `minimal.html`
 
-The name of the budget: 1,024 bytes. This lands 1 byte under it.
+The name of the budget: 1,024 bytes. `index.html` lands 1 byte under it; the other two stay well below.
 
 **Zoom in.** In `index.html` cells are 22×24 px, which is tiny on a modern display. Use the browser's zoom — `Ctrl` `+`, or `⌘` `+` on macOS; around **300%** is comfortable. `Ctrl` `0` resets it. Nothing breaks on the way up: the cells are sized in HTML attributes and the pieces are text glyphs, so the whole board scales cleanly at any zoom level.
 
 ---
 
 ## What's in it
+
+This section describes `index.html`. The two smaller builds are described below by what they change.
 
 - **All piece movement**, geometry derived from arithmetic — no direction tables, no offset arrays.
 - **Full legality.** A move that leaves your own king in check is never accepted. Every candidate is played on a cloned board and the king is queried.
@@ -33,11 +42,11 @@ The name of the budget: 1,024 bytes. This lands 1 byte under it.
 
 ## What's not in it
 
-No clock, no 50-move rule, no repetition counter, no insufficient-material test, no draw offers, no result codes, no bot. Mate and stalemate are not told apart — both simply end the game. For the full FIDE arbiter with all of that, see [fidelite.art](https://www.fidelite.art/).
+No clock, no 50-move rule, no repetition counter, no insufficient-material test, no draw offers, no result codes, no bot. Mate and stalemate are not told apart — in `index.html` and `minimal.html` both simply end the game, and in `Lowest.html` the game does not end at all. For the full FIDE arbiter with all of that, see [fidelite.art](https://www.fidelite.art/).
 
 ---
 
-## `minimum.html`
+## `minimal.html`
 
 The same rule set with the interface cut back to what is needed to play.
 
@@ -52,49 +61,67 @@ The same rule set with the interface cut back to what is needed to play.
 
 ---
 
+## `Lowest.html`
+
+The same rule set with no board at all. The whole interface is one `prompt()` dialog.
+
+**Kept:** full legality, castling with every condition, en passant as a ghost, promotion to any piece.
+
+**Changed or dropped:**
+
+- **No board.** Nothing is drawn. The dialog shows the last move, exactly as it was typed, and nothing else; keeping the position in mind is up to the players.
+- **Moves as numbers.** Four digits: the from-square, then the to-square, each written as two digits from `00` to `63` — a1 is `00`, h1 `07`, a8 `56`, h8 `63`. `e2e4` is `1228`. Castling is written as the king's move: `0406` and `0402` for White, `6062` and `6058` for Black. En passant uses the square the pawn actually lands on.
+- **Promotion from a fifth digit.** `0` bishop, `1` rook, `2` knight; anything else, or nothing, queen. Characters after the fifth are ignored.
+- **Nothing is ever rejected loudly.** A move for the wrong side, an illegal move, letters, an empty line, Cancel: the dialog comes back with the same text.
+- **No ending.** The game has no finished state. When the side to move has no legal move — checkmate or stalemate — every input is refused and the dialog keeps showing the last move. The loop never exits; close the tab to stop.
+
+---
+
 ## Files
 
 | file | size | what |
 | ---- | ---- | ---- |
 | `index.html` | 1,023 B | the game, packed and playable |
 | `chess.js` | 1,164 B | its plain source, one line, unpacked |
-| `minimum.html` | 830 B | the reduced build, packed and playable |
-| `minimum.js` | 867 B | its plain source, one line, unpacked |
-| `pack.js` | 1,588 B | rebuilds both HTML files from the sources and checks them byte for byte |
+| `minimal.html` | 830 B | the reduced build, packed and playable |
+| `minimal.js` | 867 B | its plain source, one line, unpacked |
+| `Lowest.html` | 766 B | the smallest build, packed and playable |
+| `Lowest.js` | 801 B | its plain source, one line, unpacked |
+| `pack.js` | 1,729 B | rebuilds all three HTML files from the sources and checks them byte for byte |
 
 ## Unpacking
 
-Both HTML files are self-extracting. Each script is a RegPack decompression loop ending in `eval(_)`. To recover the plain source, replace that call:
+All three HTML files are self-extracting. Each script is a RegPack decompression loop ending in `eval(_)`. To recover the plain source, replace that call:
 
 ```js
 eval(_)   →   console.log(_)
 ```
 
-The loop itself runs no game code, so this is safe to do in Node. `chess.js` and `minimum.js` in this repo are exactly what comes out.
+The loop itself runs no game code, so this is safe to do in Node. `chess.js`, `minimal.js` and `Lowest.js` in this repo are exactly what comes out.
 
 ## Packing
 
-[RegPack 5.0.1](https://github.com/Siorki/RegPack). These settings reproduce both files **byte for byte** from their sources (RegPack 5.0.4 gives the same output):
+[RegPack 5.0.1](https://github.com/Siorki/RegPack). These settings reproduce all three files **byte for byte** from their sources (RegPack 5.0.4 gives the same output):
 
-| option | `index.html` | `minimum.html` |
-| ------ | ------------ | -------------- |
-| `reassignVars` | `false` | `false` |
-| `crushGainFactor` | `1` | `0.5` |
-| `crushLengthFactor` | `0.5` | `0` |
-| `crushCopiesFactor` | `0` | `1` |
-| `crushTiebreakerFactor` | `0` | `0` |
-| `withMath` | `false` | `false` |
-| `wrapInSetInterval` | `false` | `false` |
-| `useES6` | `true` | `true` |
+| option | `index.html` | `minimal.html` | `Lowest.html` |
+| ------ | ------------ | -------------- | ------------- |
+| `reassignVars` | `false` | `false` | `false` |
+| `crushGainFactor` | `1` | `0.5` | `0` |
+| `crushLengthFactor` | `0.5` | `0` | `0.5` |
+| `crushCopiesFactor` | `1` | `1` | `0.5` |
+| `crushTiebreakerFactor` | `0` | `0` | `0` |
+| `withMath` | `false` | `false` | `false` |
+| `wrapInSetInterval` | `false` | `false` | `false` |
+| `useES6` | `true` | `true` | `true` |
 
-In both, the winning stage is 2, the regexp character class. Byte layout:
+In all three, the winning stage is 2, the regexp character class. Byte layout:
 
 ```
-28 B  <center><table id=T><script>        32 B  <input id=p><table id=T><script>
-986 B  packed payload                     789 B  packed payload
- 9 B  </script>                            9 B  </script>
-----                                      ----
-1023 B                                    830 B
+28 B  <center><table id=T><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
+986 B  packed payload                  789 B  packed payload                     749 B  packed payload
+ 9 B  </script>                         9 B  </script>                            9 B  </script>
+----                                   ----                                      ----
+1023 B                                 830 B                                     766 B
 ```
 
 To rebuild:
@@ -102,12 +129,23 @@ To rebuild:
 ```
 npm install regpack@5.0.1
 node pack.js --check    # compare with the committed files
-node pack.js            # rewrite index.html and minimum.html
+node pack.js            # rewrite index.html, minimal.html and Lowest.html
 ```
 
 With the `regpack` command line, pass `--no-reassignVars`. Written as `--reassignVars false`, the value arrives as the string `"false"`, which counts as true, and the variables get renamed.
 
-Only the script is packed; the HTML shell is not. Note that shortening the source does **not** reliably shorten the output — the packer pays for repeated substrings, so a longer source with more repetition often packs smaller. Several edits in `index.html` are deliberately longer than they need to be for exactly that reason. Of the behaviour-preserving rewrites tried on `chess.js`, none packed smaller and two packed larger, one of them by six bytes. Two later ones say the same thing from both sides. Writing `66>>j` instead of `j%5==1` shortens the source by a byte and lengthens the packed output by one — it only comes back to 1,023 with a different crush tuple, which is why the table above no longer reads `0, 0, 0, 0`. Replacing `p%2^g` with `p&1^g` costs nothing in the source and **two bytes** in the output, and no setting recovers them; it was not taken. In `minimum.js` the same substitution on `b[f]%2^t` went the other way and saved one byte, and `o%5==1` → `66>>o` had saved one before it.
+Only the script is packed; the HTML shell is not. Note that shortening the source does **not** reliably shorten the output — the packer pays for repeated substrings, so a longer source with more repetition often packs smaller. Several edits in `index.html` are deliberately longer than they need to be for exactly that reason. Of the behaviour-preserving rewrites tried on `chess.js`, none packed smaller and two packed larger, one of them by six bytes. Two later ones say the same thing from both sides. Writing `66>>j` instead of `j%5==1` shortens the source by a byte and lengthens the packed output by one — it only comes back to 1,023 with a different crush tuple, which is why the table above no longer reads `0, 0, 0, 0`. Replacing `p%2^g` with `p&1^g` costs nothing in the source and **two bytes** in the output, and no setting recovers them; it was not taken. In `minimal.js` the same substitution on `b[f]%2^t` went the other way and saved one byte, and `o%5==1` → `66>>o` had saved one before it.
+
+`Lowest.js` is the clearest case. Written as plainly as possible, the script is 787 bytes, and packed as it stands it gives a 785-byte file. Three rewrites, each one longer than or as long as what it replaces, bring that down to 766:
+
+| rewrite | source | packed, alone |
+| ------- | ------ | ------------- |
+| the alias `a=Math.abs` removed, `Math.abs(` written out at its three uses | +10 B | −4 B |
+| the square parameter of `L` and `V` renamed from `u` to `f`, so that `(i,f`, `G(i,f` and `M(i,f` repeat | ±0 B | −9 B |
+| en passant as a ghost instead of an `e` variable | +4 B | −6 B |
+| all three together | +14 B | **−19 B** |
+
+The effects do not simply add up; each one changes the repeats the others work with. Replacing `p&1^s` with `p%2^s` made no difference here in either direction.
 
 ---
 
@@ -117,7 +155,9 @@ The markup is legacy throughout, because legacy is shorter: `<center>`, `bgcolor
 
 There is no doctype either, which puts the page in **quirks mode** — deliberately. That is what keeps the presentational attributes rendering, and it is also why every cell carries its own `<center>`: in quirks mode a table does not inherit `text-align` from its ancestors, so the outer `<center>` alone will not centre the glyphs.
 
-`minimum.html` goes further: an unclosed `<input id=p>`, an unclosed `<table id=T>`, and `<th>` cells, which are bold and centred by default, so no `<center>` is needed.
+`minimal.html` goes further: an unclosed `<input id=p>`, an unclosed `<table id=T>`, and `<th>` cells, which are bold and centred by default, so no `<center>` is needed.
+
+`Lowest.html` goes to the end of that road: the file is a single `<script>` element and the page itself stays empty. There is no markup left to be legacy about.
 
 `id=T` and `id=p` are enough to reach the table and the text box from script; the browser exposes them as globals.
 
@@ -134,28 +174,37 @@ The engine's design, the full rule coverage and a line-by-line walkthrough of th
 
 <a id="turkce"></a>
 
-# chess1023byte (Türkçe)
+# chessinbytes (Türkçe)
 
-HTML + JavaScript ile **1.023 bayt** içinde yazılmış iki kişilik bir satranç oyunu. Tek dosya, kütüphane yok, derleme adımı yok, sunucu yok. `index.html` dosyasını indirin, çift tıklayın, oynayın.
+Baytlar içinde iki kişilik satranç. Üç sürüm, her biri 1 KB'nin altında tek bir HTML dosyası: kütüphane yok, derleme adımı yok, sunucu yok. Birini indirin, çift tıklayın, oynayın.
 
-Sadeleştirilmiş sürüm `minimum.html`, aynı kuralları **830 bayt** içinde tutar ve arayüzün çoğunu çıkarır.
+| dosya | boyut | nasıl oynanır |
+| ----- | ----- | ------------- |
+| `index.html` | **1.023 B** | tahtaya tıklanarak; taş karakterleri, tahta çevirme, terfi seçici |
+| `minimal.html` | **830 B** | tahtaya tıklanarak; taşlar onaltılık rakamlarla gösterilir |
+| `Lowest.html` | **766 B** | hamleler bir pencereye sayı olarak yazılır; tahta hiç yok |
+
+Üçü de aynı kuralları uygular: tam yasallık kontrolü, tüm koşullarıyla rok, geçerken alma, her taşa terfi.
 
 [Golfstack](https://www.fidelite.art/) projesinin bir parçasıdır.
 
 ## Oyna
 
-- [cuneytinann.github.io/chess1023byte](https://cuneytinann.github.io/chess1023byte/) — `index.html`
-- [cuneytinann.github.io/chess1023byte/minimum.html](https://cuneytinann.github.io/chess1023byte/minimum.html) — `minimum.html`
+- [cuneytinann.github.io/chessinbytes](https://cuneytinann.github.io/chessinbytes/) — `index.html`
+- [cuneytinann.github.io/chessinbytes/minimal.html](https://cuneytinann.github.io/chessinbytes/minimal.html) — `minimal.html`
+- [cuneytinann.github.io/chessinbytes/Lowest.html](https://cuneytinann.github.io/chessinbytes/Lowest.html) — `Lowest.html`
 - [fidelite.art/special/DOM_1023.html](https://www.fidelite.art/special/DOM_1023.html) — `index.html` ile aynı dosya, proje sitesinde paketlenmiş `L1` sürümü olarak yansıtılmış hâli
-- [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — `minimum.html` ile aynı dosya
+- [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — `minimal.html` ile aynı dosya
 
-Hedeflenen sınır 1.024 bayt; bu sürüm onun 1 bayt altında kalıyor.
+Hedeflenen sınır 1.024 bayt. `index.html` onun 1 bayt altında kalıyor; öteki ikisi epey aşağıda.
 
 **Yakınlaştırın.** `index.html`'de kareler 22×24 piksel; modern bir ekranda çok küçük kalıyor. Tarayıcının yakınlaştırmasını kullanın — `Ctrl` `+`, macOS'ta `⌘` `+`; **%300** civarı rahattır. `Ctrl` `0` sıfırlar. Büyütürken hiçbir şey bozulmaz: kare boyutları HTML özniteliklerinde tanımlı, taşlar da metin karakterleri olduğu için tahta her yakınlaştırma düzeyinde temiz ölçeklenir.
 
 ---
 
 ## İçinde neler var
+
+Bu bölüm `index.html`'i anlatır. Daha küçük iki sürüm aşağıda, neyi değiştirdikleriyle anlatılıyor.
 
 - **Tüm taş hareketleri**, geometrisi aritmetikten türetilmiş — yön tablosu yok, ofset dizisi yok.
 - **Tam yasallık kontrolü.** Kendi şahınızı şah altında bırakan bir hamle asla kabul edilmez. Her aday hamle kopyalanmış bir tahtada oynanır ve şahın durumu sorgulanır.
@@ -167,11 +216,11 @@ Hedeflenen sınır 1.024 bayt; bu sürüm onun 1 bayt altında kalıyor.
 
 ## İçinde neler yok
 
-Saat yok, 50 hamle kuralı yok, tekrar sayacı yok, yetersiz materyal testi yok, beraberlik teklifi yok, sonuç kodları yok, bot yok. Mat ile pat birbirinden ayırt edilmez — ikisi de oyunu bitirir, o kadar. Tüm bunları içeren eksiksiz FIDE hakemi için [fidelite.art](https://www.fidelite.art/) adresine bakın.
+Saat yok, 50 hamle kuralı yok, tekrar sayacı yok, yetersiz materyal testi yok, beraberlik teklifi yok, sonuç kodları yok, bot yok. Mat ile pat birbirinden ayırt edilmez — `index.html` ve `minimal.html`'de ikisi de oyunu bitirir, o kadar; `Lowest.html`'de ise oyun hiç bitmez. Tüm bunları içeren eksiksiz FIDE hakemi için [fidelite.art](https://www.fidelite.art/) adresine bakın.
 
 ---
 
-## `minimum.html`
+## `minimal.html`
 
 Aynı kural seti; arayüz, oynamak için gerekene kadar kısılmış.
 
@@ -186,49 +235,67 @@ Aynı kural seti; arayüz, oynamak için gerekene kadar kısılmış.
 
 ---
 
+## `Lowest.html`
+
+Aynı kural seti, tahtasız. Arayüzün tamamı tek bir `prompt()` penceresi.
+
+**Korunanlar:** tam yasallık kontrolü, tüm koşullarıyla rok, hayalet olarak geçerken alma, her taşa terfi.
+
+**Değişen ya da çıkarılanlar:**
+
+- **Tahta yok.** Hiçbir şey çizilmez. Pencere son hamleyi, yazıldığı gibi gösterir, başka bir şey göstermez; pozisyonu akılda tutmak oyunculara kalır.
+- **Hamleler sayıyla.** Dört rakam: önce çıkış karesi, sonra varış karesi, her biri `00` ile `63` arasında iki rakamla yazılır — a1 `00`, h1 `07`, a8 `56`, h8 `63`. `e2e4`, `1228` olur. Rok şahın hamlesiyle yazılır: beyaz için `0406` ve `0402`, siyah için `6062` ve `6058`. Geçerken almada piyonun gerçekten vardığı kare yazılır.
+- **Terfi beşinci rakamdan.** `0` fil, `1` kale, `2` at; başka herhangi bir şey ya da hiçbir şey vezir. Beşinci karakterden sonrası yok sayılır.
+- **Hiçbir şey sesli reddedilmez.** Yanlış tarafın hamlesi, kurala aykırı bir hamle, harfler, boş satır, İptal: pencere aynı metinle geri gelir.
+- **Bitiş yok.** Oyunun bitmiş bir hâli yoktur. Sırası gelen tarafın yasal hamlesi kalmadığında — mat da olsa pat da olsa — her girdi reddedilir ve pencere son hamleyi göstermeye devam eder. Döngü hiç sona ermez; durdurmak için sekmeyi kapatın.
+
+---
+
 ## Dosyalar
 
 | dosya | boyut | ne |
 | ----- | ----- | -- |
 | `index.html` | 1.023 B | oyun, paketlenmiş ve oynanabilir |
 | `chess.js` | 1.164 B | paketlenmemiş kaynak kodu, tek satır |
-| `minimum.html` | 830 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
-| `minimum.js` | 867 B | paketlenmemiş kaynak kodu, tek satır |
-| `pack.js` | 1.588 B | iki HTML dosyasını kaynaklardan yeniden üretir ve bayt bayt karşılaştırır |
+| `minimal.html` | 830 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
+| `minimal.js` | 867 B | paketlenmemiş kaynak kodu, tek satır |
+| `Lowest.html` | 766 B | en küçük sürüm, paketlenmiş ve oynanabilir |
+| `Lowest.js` | 801 B | paketlenmemiş kaynak kodu, tek satır |
+| `pack.js` | 1.729 B | üç HTML dosyasını kaynaklardan yeniden üretir ve bayt bayt karşılaştırır |
 
 ## Paketi açma
 
-İki HTML dosyası da kendi kendini açar. Her betik, `eval(_)` ile biten bir RegPack açma döngüsüdür. Paketlenmemiş kaynak kodu elde etmek için bu çağrıyı değiştirin:
+Üç HTML dosyası da kendi kendini açar. Her betik, `eval(_)` ile biten bir RegPack açma döngüsüdür. Paketlenmemiş kaynak kodu elde etmek için bu çağrıyı değiştirin:
 
 ```js
 eval(_)   →   console.log(_)
 ```
 
-Döngünün kendisi hiçbir oyun kodu çalıştırmaz, bu yüzden bunu Node'da yapmak güvenlidir. Bu depodaki `chess.js` ve `minimum.js` tam olarak bu işlemin çıktısıdır.
+Döngünün kendisi hiçbir oyun kodu çalıştırmaz, bu yüzden bunu Node'da yapmak güvenlidir. Bu depodaki `chess.js`, `minimal.js` ve `Lowest.js` tam olarak bu işlemin çıktısıdır.
 
 ## Paketleme
 
-[RegPack 5.0.1](https://github.com/Siorki/RegPack). Aşağıdaki ayarlar iki dosyayı da kaynaklarından **bayt bayt aynı** şekilde yeniden üretir (RegPack 5.0.4 de aynı çıktıyı verir):
+[RegPack 5.0.1](https://github.com/Siorki/RegPack). Aşağıdaki ayarlar üç dosyayı da kaynaklarından **bayt bayt aynı** şekilde yeniden üretir (RegPack 5.0.4 de aynı çıktıyı verir):
 
-| seçenek | `index.html` | `minimum.html` |
-| ------- | ------------ | -------------- |
-| `reassignVars` | `false` | `false` |
-| `crushGainFactor` | `1` | `0.5` |
-| `crushLengthFactor` | `0.5` | `0` |
-| `crushCopiesFactor` | `0` | `1` |
-| `crushTiebreakerFactor` | `0` | `0` |
-| `withMath` | `false` | `false` |
-| `wrapInSetInterval` | `false` | `false` |
-| `useES6` | `true` | `true` |
+| seçenek | `index.html` | `minimal.html` | `Lowest.html` |
+| ------- | ------------ | -------------- | ------------- |
+| `reassignVars` | `false` | `false` | `false` |
+| `crushGainFactor` | `1` | `0.5` | `0` |
+| `crushLengthFactor` | `0.5` | `0` | `0.5` |
+| `crushCopiesFactor` | `1` | `1` | `0.5` |
+| `crushTiebreakerFactor` | `0` | `0` | `0` |
+| `withMath` | `false` | `false` | `false` |
+| `wrapInSetInterval` | `false` | `false` | `false` |
+| `useES6` | `true` | `true` | `true` |
 
-İkisinde de kazanan aşama 2, yani regexp karakter sınıfı aşamasıdır. Bayt düzeni:
+Üçünde de kazanan aşama 2, yani regexp karakter sınıfı aşamasıdır. Bayt düzeni:
 
 ```
-28 B  <center><table id=T><script>        32 B  <input id=p><table id=T><script>
-986 B  paketlenmiş yük                    789 B  paketlenmiş yük
- 9 B  </script>                            9 B  </script>
-----                                      ----
-1023 B                                    830 B
+28 B  <center><table id=T><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
+986 B  paketlenmiş yük                 789 B  paketlenmiş yük                    749 B  paketlenmiş yük
+ 9 B  </script>                         9 B  </script>                            9 B  </script>
+----                                   ----                                      ----
+1023 B                                 830 B                                     766 B
 ```
 
 Yeniden üretmek için:
@@ -236,12 +303,23 @@ Yeniden üretmek için:
 ```
 npm install regpack@5.0.1
 node pack.js --check    # depodaki dosyalarla karşılaştırır
-node pack.js            # index.html ve minimum.html dosyalarını yeniden yazar
+node pack.js            # index.html, minimal.html ve Lowest.html dosyalarını yeniden yazar
 ```
 
 `regpack` komut satırını kullanıyorsanız `--no-reassignVars` yazın. `--reassignVars false` biçiminde yazılan değer `"false"` metni olarak gelir, doğru sayılır ve değişkenler yeniden adlandırılır.
 
-Yalnızca betik paketlenir; HTML kabuğu paketlenmez. Şunu not edin: kaynağı kısaltmak çıktıyı **güvenilir biçimde kısaltmaz** — paketleyici kazancını tekrar eden alt dizelerden elde eder, bu yüzden daha çok tekrar içeren daha uzun bir kaynak çoğu zaman daha küçük paketlenir. `index.html`'deki bazı düzenlemeler tam da bu nedenle, gerekenden bilerek daha uzun tutulmuştur. `chess.js` üzerinde denenen, davranışı değiştirmeyen yeniden yazımların hiçbiri daha küçük paketlenmedi, ikisi büyüttü, biri altı bayt. Sonradan gelen iki tanesi aynı şeyi iki yönden söylüyor. `j%5==1` yerine `66>>j` yazmak kaynağı bir bayt kısaltıp paketi bir bayt uzatıyor — 1.023'e ancak başka bir crush dörtlüsüyle dönüyor, yukarıdaki tablonun artık `0, 0, 0, 0` olmamasının sebebi bu. `p%2^g` yerine `p&1^g` yazmak kaynakta hiçbir şeye mal olmuyor, çıktıda **iki bayta**, ve hiçbir ayar onu geri almıyor; alınmadı. `minimum.js`'te aynı değişiklik `b[f]%2^t` üzerinde ters yönde işledi ve bir bayt kazandırdı, ondan önce de `o%5==1` → `66>>o` bir bayt kazandırmıştı.
+Yalnızca betik paketlenir; HTML kabuğu paketlenmez. Şunu not edin: kaynağı kısaltmak çıktıyı **güvenilir biçimde kısaltmaz** — paketleyici kazancını tekrar eden alt dizelerden elde eder, bu yüzden daha çok tekrar içeren daha uzun bir kaynak çoğu zaman daha küçük paketlenir. `index.html`'deki bazı düzenlemeler tam da bu nedenle, gerekenden bilerek daha uzun tutulmuştur. `chess.js` üzerinde denenen, davranışı değiştirmeyen yeniden yazımların hiçbiri daha küçük paketlenmedi, ikisi büyüttü, biri altı bayt. Sonradan gelen iki tanesi aynı şeyi iki yönden söylüyor. `j%5==1` yerine `66>>j` yazmak kaynağı bir bayt kısaltıp paketi bir bayt uzatıyor — 1.023'e ancak başka bir crush dörtlüsüyle dönüyor, yukarıdaki tablonun artık `0, 0, 0, 0` olmamasının sebebi bu. `p%2^g` yerine `p&1^g` yazmak kaynakta hiçbir şeye mal olmuyor, çıktıda **iki bayta**, ve hiçbir ayar onu geri almıyor; alınmadı. `minimal.js`'te aynı değişiklik `b[f]%2^t` üzerinde ters yönde işledi ve bir bayt kazandırdı, ondan önce de `o%5==1` → `66>>o` bir bayt kazandırmıştı.
+
+`Lowest.js` bunun en açık örneği. Olabildiğince düz yazıldığında betik 787 bayt ve olduğu gibi paketlenince 785 baytlık bir dosya veriyor. Her biri yerine geçtiği şeyden daha uzun ya da onunla aynı uzunlukta üç yeniden yazım bunu 766'ya indiriyor:
+
+| yeniden yazım | kaynak | paket, tek başına |
+| ------------- | ------ | ----------------- |
+| `a=Math.abs` takma adı kaldırıldı, `Math.abs(` üç kullanımda da açık yazıldı | +10 B | −4 B |
+| `L` ile `V`'nin kare parametresinin adı `u`'dan `f`'ye çevrildi; böylece `(i,f`, `G(i,f` ve `M(i,f` tekrar ediyor | ±0 B | −9 B |
+| geçerken alma, `e` değişkeni yerine hayalet olarak | +4 B | −6 B |
+| üçü birlikte | +14 B | **−19 B** |
+
+Etkiler basitçe toplanmıyor; her biri ötekilerin üzerinde çalıştığı tekrarları değiştiriyor. `p&1^s` yerine `p%2^s` yazmak burada iki yönde de fark yaratmadı.
 
 ---
 
@@ -251,7 +329,9 @@ Yalnızca betik paketlenir; HTML kabuğu paketlenmez. Şunu not edin: kaynağı 
 
 Doctype da yok; bu da sayfayı **quirks mode**'a sokar — bilerek. Görünümle ilgili eski özniteliklerin hâlâ işlemesini sağlayan budur; her karenin kendi `<center>` etiketini taşımasının nedeni de budur: quirks mode'da bir tablo `text-align` değerini üst öğelerinden devralmaz, bu yüzden dıştaki `<center>` tek başına taşları ortalamaya yetmez.
 
-`minimum.html` bir adım daha ileri gider: kapatılmamış bir `<input id=p>`, kapatılmamış bir `<table id=T>` ve varsayılan olarak kalın ve ortalanmış gelen `<th>` hücreleri; bu yüzden `<center>` gerekmez.
+`minimal.html` bir adım daha ileri gider: kapatılmamış bir `<input id=p>`, kapatılmamış bir `<table id=T>` ve varsayılan olarak kalın ve ortalanmış gelen `<th>` hücreleri; bu yüzden `<center>` gerekmez.
+
+`Lowest.html` bu yolun sonuna gider: dosya tek bir `<script>` öğesinden ibarettir ve sayfanın kendisi boş kalır. Eski usul yazılacak işaretleme kalmamıştır.
 
 Tabloya ve metin kutusuna betikten ulaşmak için `id=T` ve `id=p` yeterlidir; tarayıcı onları global değişken olarak sunar.
 

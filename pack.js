@@ -1,5 +1,5 @@
-// pack.js — rebuilds index.html and minimum.html from chess.js and minimum.js
-// with RegPack 5.0.1, using the settings documented in README.md.
+// pack.js — rebuilds index.html, minimal.html and Lowest.html from chess.js,
+// minimal.js and Lowest.js with RegPack 5.0.1, using the settings documented in README.md.
 //
 //   npm install regpack@5.0.1
 //   node pack.js --check    compare with the committed HTML files
@@ -8,8 +8,9 @@ const fs = require('fs');
 const { cmdRegPack } = require('regpack');
 
 const BUILDS = [
-  { src: 'chess.js',   out: 'index.html',   head: '<center><table id=T><script>', crush: [1, 0.5, 1, 0] },
-  { src: 'minimum.js', out: 'minimum.html', head: '<input id=p><table id=T><script>', crush: [0.5, 0, 1, 0] },
+  { src: 'chess.js',   out: 'index.html',   head: '<center><table id=T><script>',     crush: [1, 0.5, 1, 0] },
+  { src: 'minimal.js', out: 'minimal.html', head: '<input id=p><table id=T><script>', crush: [0.5, 0, 1, 0] },
+  { src: 'Lowest.js',  out: 'Lowest.html',  head: '<script>',                         crush: [0, 0.5, 0.5, 0] },
 ];
 
 const check = process.argv.includes('--check');
