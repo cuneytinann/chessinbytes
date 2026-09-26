@@ -6,7 +6,7 @@ Two-player chess in bytes. Three builds, each a single HTML file under 1 KB: no 
 
 | file | size | how it plays |
 | ---- | ---- | ------------ |
-| `index.html` | **1,008 B** | click the board; piece glyphs, board flip, promotion picker |
+| `index.html` | **1,021 B** | click the board; piece glyphs, board flip, promotion picker, drawn at three times its size |
 | `minimal.html` | **815 B** | click the board; pieces shown as hexadecimal digits |
 | `Lowest.html` | **748 B** | type moves as numbers into a dialog; no board at all |
 
@@ -19,12 +19,12 @@ Part of the [Golfstack](https://www.fidelite.art/) project.
 - [cuneytinann.github.io/chessinbytes](https://cuneytinann.github.io/chessinbytes/) — `index.html`
 - [cuneytinann.github.io/chessinbytes/minimal.html](https://cuneytinann.github.io/chessinbytes/minimal.html) — `minimal.html`
 - [cuneytinann.github.io/chessinbytes/Lowest.html](https://cuneytinann.github.io/chessinbytes/Lowest.html) — `Lowest.html`
-- [fidelite.art/special/DOM_1023.html](https://www.fidelite.art/special/DOM_1023.html) — same file as `index.html`, mirrored on the project site under `special`
+- [fidelite.art/special/DOM_1021.html](https://www.fidelite.art/special/DOM_1021.html) — same file as `index.html`, mirrored on the project site under `special`
 - [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — same file as `minimal.html`
 
-The name of the budget: 1,024 bytes. `index.html` lands 16 bytes under it; the other two stay well below.
+The name of the budget: 1,024 bytes. `index.html` lands 3 bytes under it; the other two stay well below.
 
-**Zoom in.** In `index.html` cells are 22×24 px, which is tiny on a modern display. Use the browser's zoom — `Ctrl` `+`, or `⌘` `+` on macOS; around **300%** is comfortable. `Ctrl` `0` resets it. Nothing breaks on the way up: the cells are sized in HTML attributes and the pieces are text glyphs, so the whole board scales cleanly at any zoom level.
+**Zoomed in by itself.** In `index.html` the cells are 22×24 px, which is tiny on a modern display, so the table carries `style=zoom:3` and the board is drawn at three times its size, 66×72 px a cell. That costs **13 bytes**, all of them in the HTML shell outside the packed payload — the packer never sees them, and the payload is byte for byte what it was at 1,008. The browser's own zoom still works on top of it — `Ctrl` `+`, or `⌘` `+` on macOS; `Ctrl` `0` resets it. Nothing breaks on the way up: the cells are sized in HTML attributes and the pieces are text glyphs, so the whole board scales cleanly at any zoom level. `zoom` was a non-standard property for a long time; it is part of CSS today and Firefox supports it from version 126. An older browser simply ignores it and shows the board at its original size.
 
 ---
 
@@ -81,13 +81,13 @@ The same rule set with no board at all. The whole interface is one `prompt()` di
 
 | file | size | what |
 | ---- | ---- | ---- |
-| `index.html` | 1,008 B | the game, packed and playable |
+| `index.html` | 1,021 B | the game, packed and playable |
 | `chess.js` | 1,151 B | its plain source, one line, unpacked |
 | `minimal.html` | 815 B | the reduced build, packed and playable |
 | `minimal.js` | 855 B | its plain source, one line, unpacked |
 | `Lowest.html` | 748 B | the smallest build, packed and playable |
 | `Lowest.js` | 788 B | its plain source, one line, unpacked |
-| `pack.js` | 1,734 B | rebuilds all three HTML files from the sources and checks them byte for byte |
+| `pack.js` | 1,761 B | rebuilds all three HTML files from the sources and checks them byte for byte |
 
 ## Unpacking
 
@@ -117,11 +117,11 @@ The loop itself runs no game code, so this is safe to do in Node. `chess.js`, `m
 In all three, the winning stage is 2, the regexp character class. Byte layout:
 
 ```
-28 B  <center><table id=T><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
-971 B  packed payload                  774 B  packed payload                     731 B  packed payload
- 9 B  </script>                         9 B  </script>                            9 B  </script>
-----                                   ----                                      ----
-1008 B                                 815 B                                     748 B
+41 B  <center><table id=T style=zoom:3><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
+971 B  packed payload                               774 B  packed payload                      731 B  packed payload
+ 9 B  </script>                                      9 B  </script>                            9 B  </script>
+----                                                ----                                       ----
+1021 B                                              815 B                                      748 B
 ```
 
 To rebuild:
@@ -166,13 +166,15 @@ Each rewrite was also tried in several equivalent spellings (`&&S()` or `&S()`, 
 
 `Lowest.js` takes the castling line with `&&` between the two attack tests (`!V(t)&&!V(t,i+k)`), one byte longer in the source and one byte shorter packed. `minimal.html` got its last byte from the settings alone: a negative length factor and a tiebreaker of `-1`, which is why its column in the table above looks unlike the other two.
 
+The sizes in this table are from before `style=zoom:3` was added. It sits in the shell, not in the payload, so it changes none of the comparisons above; it only moves `index.html` from 1,008 to 1,021.
+
 All three were checked against the previous files: perft from the starting position, Kiwipete and CPW position 3, a geometry comparison on random boards, and old and new packed files driven side by side through their real inputs — clicks or `prompt()` answers — with the board, the ghost, the side to move, the castling rights and the rendered output compared after every action.
 
 ---
 
 ## Deprecated on purpose
 
-The markup is legacy throughout, because legacy is shorter: `<center>`, `bgcolor`, `width` and `height` on `<td>`, unquoted attribute values, no closing `</tr>` or `</td>`, and no `<html>`, `<head>` or `<body>` at all.
+The markup is legacy throughout, because legacy is shorter: `<center>`, `bgcolor`, `width` and `height` on `<td>`, unquoted attribute values, no closing `</tr>` or `</td>`, and no `<html>`, `<head>` or `<body>` at all. The one piece of CSS is `style=zoom:3` on the table in `index.html`: a single attribute that scales cells and glyphs together, where enlarging them by hand would mean a bigger `width`, `height` and font on every cell.
 
 There is no doctype either, which puts the page in **quirks mode** — deliberately. That is what keeps the presentational attributes rendering, and it is also why every cell carries its own `<center>`: in quirks mode a table does not inherit `text-align` from its ancestors, so the outer `<center>` alone will not centre the glyphs.
 
@@ -201,7 +203,7 @@ Baytlar içinde iki kişilik satranç. Üç sürüm, her biri 1 KB'nin altında 
 
 | dosya | boyut | nasıl oynanır |
 | ----- | ----- | ------------- |
-| `index.html` | **1.008 B** | tahtaya tıklanarak; taş karakterleri, tahta çevirme, terfi seçici |
+| `index.html` | **1.021 B** | tahtaya tıklanarak; taş karakterleri, tahta çevirme, terfi seçici, üç kat büyük çizilir |
 | `minimal.html` | **815 B** | tahtaya tıklanarak; taşlar onaltılık rakamlarla gösterilir |
 | `Lowest.html` | **748 B** | hamleler bir pencereye sayı olarak yazılır; tahta hiç yok |
 
@@ -214,12 +216,12 @@ Baytlar içinde iki kişilik satranç. Üç sürüm, her biri 1 KB'nin altında 
 - [cuneytinann.github.io/chessinbytes](https://cuneytinann.github.io/chessinbytes/) — `index.html`
 - [cuneytinann.github.io/chessinbytes/minimal.html](https://cuneytinann.github.io/chessinbytes/minimal.html) — `minimal.html`
 - [cuneytinann.github.io/chessinbytes/Lowest.html](https://cuneytinann.github.io/chessinbytes/Lowest.html) — `Lowest.html`
-- [fidelite.art/special/DOM_1023.html](https://www.fidelite.art/special/DOM_1023.html) — `index.html` ile aynı dosya, proje sitesinde `special` altında yansıtılmış hâli
+- [fidelite.art/special/DOM_1021.html](https://www.fidelite.art/special/DOM_1021.html) — `index.html` ile aynı dosya, proje sitesinde `special` altında yansıtılmış hâli
 - [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — `minimal.html` ile aynı dosya
 
-Hedeflenen sınır 1.024 bayt. `index.html` onun 16 bayt altında kalıyor; öteki ikisi epey aşağıda.
+Hedeflenen sınır 1.024 bayt. `index.html` onun 3 bayt altında kalıyor; öteki ikisi epey aşağıda.
 
-**Yakınlaştırın.** `index.html`'de kareler 22×24 piksel; modern bir ekranda çok küçük kalıyor. Tarayıcının yakınlaştırmasını kullanın — `Ctrl` `+`, macOS'ta `⌘` `+`; **%300** civarı rahattır. `Ctrl` `0` sıfırlar. Büyütürken hiçbir şey bozulmaz: kare boyutları HTML özniteliklerinde tanımlı, taşlar da metin karakterleri olduğu için tahta her yakınlaştırma düzeyinde temiz ölçeklenir.
+**Kendiliğinden büyük.** `index.html`'de kareler 22×24 piksel; modern bir ekranda çok küçük kalıyor. Bu yüzden tabloda `style=zoom:3` duruyor ve tahta üç kat büyük, kare başına 66×72 piksel çiziliyor. Bedeli **13 bayt** ve hepsi paketlenmiş yükün dışında, HTML kabuğunda — paketleyici onları hiç görmüyor, yük 1.008 bayttaki hâliyle bayt bayt aynı. Tarayıcının kendi yakınlaştırması da bunun üstüne çalışıyor — `Ctrl` `+`, macOS'ta `⌘` `+`; `Ctrl` `0` sıfırlar. Büyütürken hiçbir şey bozulmaz: kare boyutları HTML özniteliklerinde tanımlı, taşlar da metin karakterleri olduğu için tahta her yakınlaştırma düzeyinde temiz ölçeklenir. `zoom` uzun süre standart dışı bir özellikti; bugün CSS'in parçası ve Firefox 126. sürümden beri destekliyor. Daha eski bir tarayıcı onu yok sayar ve tahtayı özgün boyutunda gösterir.
 
 ---
 
@@ -276,13 +278,13 @@ Aynı kural seti, tahtasız. Arayüzün tamamı tek bir `prompt()` penceresi.
 
 | dosya | boyut | ne |
 | ----- | ----- | -- |
-| `index.html` | 1.008 B | oyun, paketlenmiş ve oynanabilir |
+| `index.html` | 1.021 B | oyun, paketlenmiş ve oynanabilir |
 | `chess.js` | 1.151 B | paketlenmemiş kaynak kodu, tek satır |
 | `minimal.html` | 815 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
 | `minimal.js` | 855 B | paketlenmemiş kaynak kodu, tek satır |
 | `Lowest.html` | 748 B | en küçük sürüm, paketlenmiş ve oynanabilir |
 | `Lowest.js` | 788 B | paketlenmemiş kaynak kodu, tek satır |
-| `pack.js` | 1.734 B | üç HTML dosyasını kaynaklardan yeniden üretir ve bayt bayt karşılaştırır |
+| `pack.js` | 1.761 B | üç HTML dosyasını kaynaklardan yeniden üretir ve bayt bayt karşılaştırır |
 
 ## Paketi açma
 
@@ -312,11 +314,11 @@ Döngünün kendisi hiçbir oyun kodu çalıştırmaz, bu yüzden bunu Node'da y
 Üçünde de kazanan aşama 2, yani regexp karakter sınıfı aşamasıdır. Bayt düzeni:
 
 ```
-28 B  <center><table id=T><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
-971 B  paketlenmiş yük                 774 B  paketlenmiş yük                    731 B  paketlenmiş yük
- 9 B  </script>                         9 B  </script>                            9 B  </script>
-----                                   ----                                      ----
-1008 B                                 815 B                                     748 B
+41 B  <center><table id=T style=zoom:3><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
+971 B  paketlenmiş yük                              774 B  paketlenmiş yük                     731 B  paketlenmiş yük
+ 9 B  </script>                                      9 B  </script>                            9 B  </script>
+----                                                ----                                       ----
+1021 B                                              815 B                                      748 B
 ```
 
 Yeniden üretmek için:
@@ -361,13 +363,15 @@ Her yeniden yazım birkaç eşdeğer yazılışla da denendi (`&&S()` ya da `&S(
 
 `Lowest.js`, rok satırını iki saldırı testi arasında `&&` ile alıyor (`!V(t)&&!V(t,i+k)`): kaynakta bir bayt uzun, pakette bir bayt kısa. `minimal.html` son baytını yalnızca ayardan aldı: negatif bir uzunluk çarpanı ve `-1` tiebreaker; yukarıdaki tabloda sütununun ötekilere benzememesinin sebebi bu.
 
+Bu tablodaki boyutlar `style=zoom:3` eklenmeden önceki. O ekleme yükte değil kabukta durduğu için yukarıdaki karşılaştırmaların hiçbirini değiştirmiyor; yalnızca `index.html`'i 1.008'den 1.021'e taşıyor.
+
 Üçü de önceki dosyalarla karşılaştırılarak doğrulandı: başlangıç pozisyonu, Kiwipete ve CPW 3. pozisyondan perft; rastgele tahtalarda geometri karşılaştırması; eski ve yeni paketli dosyalar gerçek girişleriyle — tıklama ya da `prompt()` cevabı — yan yana sürüldü ve her adımdan sonra tahta, hayalet, sıra, rok hakları ve ekrana basılan çıktı karşılaştırıldı.
 
 ---
 
 ## Bilinçli olarak eski usul
 
-İşaretleme baştan sona eski usul yazılmıştır, çünkü eski usul daha kısadır: `<center>`, `bgcolor`, `<td>` üzerinde `width` ve `height`, tırnaksız öznitelik değerleri, kapanış `</tr>` veya `</td>` yok, `<html>`, `<head>` ya da `<body>` hiç yok.
+İşaretleme baştan sona eski usul yazılmıştır, çünkü eski usul daha kısadır: `<center>`, `bgcolor`, `<td>` üzerinde `width` ve `height`, tırnaksız öznitelik değerleri, kapanış `</tr>` veya `</td>` yok, `<html>`, `<head>` ya da `<body>` hiç yok. Tek CSS parçası `index.html`'deki tablonun `style=zoom:3`'ü: kareleri ve taşları birlikte ölçekleyen tek bir öznitelik; elle büyütmek her karede daha büyük bir `width`, `height` ve yazı boyu demek olurdu.
 
 Doctype da yok; bu da sayfayı **quirks mode**'a sokar — bilerek. Görünümle ilgili eski özniteliklerin hâlâ işlemesini sağlayan budur; her karenin kendi `<center>` etiketini taşımasının nedeni de budur: quirks mode'da bir tablo `text-align` değerini üst öğelerinden devralmaz, bu yüzden dıştaki `<center>` tek başına taşları ortalamaya yetmez.
 
