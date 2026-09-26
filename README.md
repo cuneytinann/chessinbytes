@@ -6,9 +6,9 @@ Two-player chess in bytes. Three builds, each a single HTML file under 1 KB: no 
 
 | file | size | how it plays |
 | ---- | ---- | ------------ |
-| `index.html` | **1,021 B** | click the board; piece glyphs, board flip, promotion picker, drawn at three times its size |
-| `minimal.html` | **815 B** | click the board; pieces shown as hexadecimal digits |
-| `Lowest.html` | **748 B** | type moves as numbers into a dialog; no board at all |
+| `index.html` | **998 B** | click the board; piece glyphs, board flip, promotion picker, drawn at three times its size |
+| `minimal.html` | **794 B** | click the board; pieces shown as hexadecimal digits |
+| `Lowest.html` | **712 B** | type moves as numbers into a dialog; no board at all |
 
 All three enforce the same rules: full legality, castling with every condition, en passant, promotion to any piece.
 
@@ -19,7 +19,7 @@ Part of the [Golfstack](https://www.fidelite.art/) project.
 - [cuneytinann.github.io/chessinbytes](https://cuneytinann.github.io/chessinbytes/) — `index.html`
 - [cuneytinann.github.io/chessinbytes/minimal.html](https://cuneytinann.github.io/chessinbytes/minimal.html) — `minimal.html`
 - [cuneytinann.github.io/chessinbytes/Lowest.html](https://cuneytinann.github.io/chessinbytes/Lowest.html) — `Lowest.html`
-- [fidelite.art/special/DOM_1021.html](https://www.fidelite.art/special/DOM_1021.html) — same file as `index.html`, mirrored on the project site under `special`
+- [fidelite.art/special/DOM_998.html](https://www.fidelite.art/special/DOM_998.html) — same file as `index.html`, mirrored on the project site under `special`
 - [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — same file as `minimal.html`
 
 The name of the budget: 1,024 bytes. `index.html` lands 3 bytes under it; the other two stay well below.
@@ -34,7 +34,7 @@ This section describes `index.html`. The two smaller builds are described below 
 
 - **All piece movement**, geometry derived from arithmetic — no direction tables, no offset arrays.
 - **Full legality.** A move that leaves your own king in check is never accepted. Every candidate is played on a cloned board and the king is queried.
-- **Castling**, both sides, with every condition: rights still held, rook path clear, king not in check, king not crossing an attacked square.
+- **Castling**, both sides, with every condition: rights still held, rook path clear, king not in check, king not crossing an attacked square. The rights are not stored as flags: every move marks the two squares it touches in an array `c`, and castling needs the king's square and the rook's square both untouched. An untouched corner still holds its original rook, so the rook is not checked separately. The full arbiter on [fidelite.art](https://www.fidelite.art/) keeps the rights as four bits instead, because its repetition count needs them in canonical form; these builds count no repetitions.
 - **En passant**, implemented as a *ghost*: the capture square is written into the board array itself as piece code `1`, which renders blank. There is no `e` state variable.
 - **Promotion with a picker.** Queen, rook, bishop, knight; the move isn't completed until you choose.
 - **Board flip.** After each move the board turns to the perspective of the side to move.
@@ -81,13 +81,13 @@ The same rule set with no board at all. The whole interface is one `prompt()` di
 
 | file | size | what |
 | ---- | ---- | ---- |
-| `index.html` | 1,021 B | the game, packed and playable |
-| `chess.js` | 1,151 B | its plain source, one line, unpacked |
-| `minimal.html` | 815 B | the reduced build, packed and playable |
-| `minimal.js` | 855 B | its plain source, one line, unpacked |
-| `Lowest.html` | 748 B | the smallest build, packed and playable |
-| `Lowest.js` | 788 B | its plain source, one line, unpacked |
-| `pack.js` | 1,761 B | rebuilds all three HTML files from the sources and checks them byte for byte |
+| `index.html` | 998 B | the game, packed and playable |
+| `chess.js` | 1,126 B | its plain source, one line, unpacked |
+| `minimal.html` | 794 B | the reduced build, packed and playable |
+| `minimal.js` | 830 B | its plain source, one line, unpacked |
+| `Lowest.html` | 712 B | the smallest build, packed and playable |
+| `Lowest.js` | 756 B | its plain source, one line, unpacked |
+| `pack.js` | 1,760 B | rebuilds all three HTML files from the sources and checks them byte for byte |
 
 ## Unpacking
 
@@ -106,10 +106,10 @@ The loop itself runs no game code, so this is safe to do in Node. `chess.js`, `m
 | option | `index.html` | `minimal.html` | `Lowest.html` |
 | ------ | ------------ | -------------- | ------------- |
 | `reassignVars` | `false` | `false` | `false` |
-| `crushGainFactor` | `1` | `1` | `0` |
-| `crushLengthFactor` | `0.5` | `-0.5` | `0.5` |
-| `crushCopiesFactor` | `1` | `0.75` | `0.5` |
-| `crushTiebreakerFactor` | `0` | `-1` | `0` |
+| `crushGainFactor` | `0.5` | `0.5` | `0.5` |
+| `crushLengthFactor` | `0` | `1` | `1` |
+| `crushCopiesFactor` | `0.25` | `0` | `0` |
+| `crushTiebreakerFactor` | `-1` | `-1` | `-1` |
 | `withMath` | `false` | `false` | `false` |
 | `wrapInSetInterval` | `false` | `false` | `false` |
 | `useES6` | `true` | `true` | `true` |
@@ -118,10 +118,10 @@ In all three, the winning stage is 2, the regexp character class. Byte layout:
 
 ```
 41 B  <center><table id=T style=zoom:3><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
-971 B  packed payload                               774 B  packed payload                      731 B  packed payload
+948 B  packed payload                               753 B  packed payload                      695 B  packed payload
  9 B  </script>                                      9 B  </script>                            9 B  </script>
 ----                                                ----                                       ----
-1021 B                                              815 B                                      748 B
+ 998 B                                              794 B                                      712 B
 ```
 
 To rebuild:
@@ -134,7 +134,7 @@ node pack.js            # rewrite index.html, minimal.html and Lowest.html
 
 With the `regpack` command line, pass `--no-reassignVars`. Written as `--reassignVars false`, the value arrives as the string `"false"`, which counts as true, and the variables get renamed.
 
-Only the script is packed; the HTML shell is not. Note that shortening the source does **not** reliably shorten the output — the packer pays for repeated substrings, so a longer source with more repetition often packs smaller. Several edits in `index.html` are deliberately longer than they need to be for exactly that reason. Of the behaviour-preserving rewrites tried on `chess.js`, none packed smaller and two packed larger, one of them by six bytes. Two later ones say the same thing from both sides. Writing `66>>j` instead of `j%5==1` shortens the source by a byte and lengthens the packed output by one — it only comes back to 1,023 with a different crush tuple, which is why the table above no longer reads `0, 0, 0, 0`. Replacing `p%2^g` with `p&1^g` costs nothing in the source and **two bytes** in the output, and no setting recovers them; it was not taken. In `minimal.js` the same substitution on `b[f]%2^t` went the other way and saved one byte, and `o%5==1` → `66>>o` had saved one before it.
+Only the script is packed; the HTML shell is not. Note that shortening the source does **not** reliably shorten the output — the packer pays for repeated substrings, so a longer source with more repetition often packs smaller. Several edits in `index.html` are deliberately longer than they need to be for exactly that reason. Of the behaviour-preserving rewrites tried on `chess.js`, none packed smaller and two packed larger, one of them by six bytes. Two later ones say the same thing from both sides. Writing `66>>j` instead of `j%5==1` shortens the source by a byte and lengthens the packed output by one — it only comes back to 1,023 with a different crush tuple. Replacing `p%2^g` with `p&1^g` costs nothing in the source and **two bytes** in the output, and no setting recovers them; it was not taken. In `minimal.js` the same substitution on `b[f]%2^t` went the other way and saved one byte, and `o%5==1` → `66>>o` had saved one before it.
 
 `Lowest.js` is the clearest case. Written as plainly as possible, the script is 787 bytes, and packed as it stands it gives a 785-byte file. Three rewrites, each one longer than or as long as what it replaces, bring that down to 766 (before the round described below):
 
@@ -164,7 +164,7 @@ Each rewrite was also tried in several equivalent spellings (`&&S()` or `&S()`, 
 | `minimal.html` | 830 | **815** | 824 | 824 | — |
 | `Lowest.html` | 766 | **748** | 756 | 756 | 749 |
 
-`Lowest.js` takes the castling line with `&&` between the two attack tests (`!V(t)&&!V(t,i+k)`), one byte longer in the source and one byte shorter packed. `minimal.html` got its last byte from the settings alone: a negative length factor and a tiebreaker of `-1`, which is why its column in the table above looks unlike the other two.
+`Lowest.js` takes the castling line with `&&` between the two attack tests (`!V()&&!V(i+k)`), one byte longer in the source and one byte shorter packed. The crush tuples in the packing table are the best found by a search over each file; all three end on a tiebreaker of `-1`.
 
 The sizes in this table are from before `style=zoom:3` was added. It sits in the shell, not in the payload, so it changes none of the comparisons above; it only moves `index.html` from 1,008 to 1,021.
 
@@ -203,9 +203,9 @@ Baytlar içinde iki kişilik satranç. Üç sürüm, her biri 1 KB'nin altında 
 
 | dosya | boyut | nasıl oynanır |
 | ----- | ----- | ------------- |
-| `index.html` | **1.021 B** | tahtaya tıklanarak; taş karakterleri, tahta çevirme, terfi seçici, üç kat büyük çizilir |
-| `minimal.html` | **815 B** | tahtaya tıklanarak; taşlar onaltılık rakamlarla gösterilir |
-| `Lowest.html` | **748 B** | hamleler bir pencereye sayı olarak yazılır; tahta hiç yok |
+| `index.html` | **998 B** | tahtaya tıklanarak; taş karakterleri, tahta çevirme, terfi seçici, üç kat büyük çizilir |
+| `minimal.html` | **794 B** | tahtaya tıklanarak; taşlar onaltılık rakamlarla gösterilir |
+| `Lowest.html` | **712 B** | hamleler bir pencereye sayı olarak yazılır; tahta hiç yok |
 
 Üçü de aynı kuralları uygular: tam yasallık kontrolü, tüm koşullarıyla rok, geçerken alma, her taşa terfi.
 
@@ -216,7 +216,7 @@ Baytlar içinde iki kişilik satranç. Üç sürüm, her biri 1 KB'nin altında 
 - [cuneytinann.github.io/chessinbytes](https://cuneytinann.github.io/chessinbytes/) — `index.html`
 - [cuneytinann.github.io/chessinbytes/minimal.html](https://cuneytinann.github.io/chessinbytes/minimal.html) — `minimal.html`
 - [cuneytinann.github.io/chessinbytes/Lowest.html](https://cuneytinann.github.io/chessinbytes/Lowest.html) — `Lowest.html`
-- [fidelite.art/special/DOM_1021.html](https://www.fidelite.art/special/DOM_1021.html) — `index.html` ile aynı dosya, proje sitesinde `special` altında yansıtılmış hâli
+- [fidelite.art/special/DOM_998.html](https://www.fidelite.art/special/DOM_998.html) — `index.html` ile aynı dosya, proje sitesinde `special` altında yansıtılmış hâli
 - [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — `minimal.html` ile aynı dosya
 
 Hedeflenen sınır 1.024 bayt. `index.html` onun 3 bayt altında kalıyor; öteki ikisi epey aşağıda.
@@ -231,7 +231,7 @@ Bu bölüm `index.html`'i anlatır. Daha küçük iki sürüm aşağıda, neyi d
 
 - **Tüm taş hareketleri**, geometrisi aritmetikten türetilmiş — yön tablosu yok, ofset dizisi yok.
 - **Tam yasallık kontrolü.** Kendi şahınızı şah altında bırakan bir hamle asla kabul edilmez. Her aday hamle kopyalanmış bir tahtada oynanır ve şahın durumu sorgulanır.
-- **Rok**, iki yöne de, tüm koşullarıyla: rok hakkı hâlâ duruyor, kale yolu açık, şah şah altında değil, şah saldırı altındaki bir kareden geçmiyor.
+- **Rok**, iki yöne de, tüm koşullarıyla: rok hakkı hâlâ duruyor, kale yolu açık, şah şah altında değil, şah saldırı altındaki bir kareden geçmiyor. Haklar bayrak olarak tutulmaz: her hamle dokunduğu iki kareyi bir `c` dizisinde işaretler; rok için şahın karesine de kalenin karesine de hiç dokunulmamış olmalıdır. Dokunulmamış bir köşede hâlâ ilk kale durur, bu yüzden kale ayrıca denetlenmez. [fidelite.art](https://www.fidelite.art/)'taki tam hakem hakları dört bit olarak tutar, çünkü tekrar sayımı onları kanonik biçimde ister; bu sürümler tekrar saymaz.
 - **Geçerken alma (en passant)**, bir *hayalet* olarak uygulanmıştır: alınacak kare, tahta dizisinin içine `1` taş koduyla yazılır ve boş görünür. Ayrı bir `e` durum değişkeni yoktur.
 - **Seçicili terfi.** Vezir, kale, fil, at; siz seçim yapana kadar hamle tamamlanmaz.
 - **Tahta çevirme.** Her hamleden sonra tahta, sırası gelen tarafın bakış açısına döner.
@@ -278,13 +278,13 @@ Aynı kural seti, tahtasız. Arayüzün tamamı tek bir `prompt()` penceresi.
 
 | dosya | boyut | ne |
 | ----- | ----- | -- |
-| `index.html` | 1.021 B | oyun, paketlenmiş ve oynanabilir |
-| `chess.js` | 1.151 B | paketlenmemiş kaynak kodu, tek satır |
-| `minimal.html` | 815 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
-| `minimal.js` | 855 B | paketlenmemiş kaynak kodu, tek satır |
-| `Lowest.html` | 748 B | en küçük sürüm, paketlenmiş ve oynanabilir |
-| `Lowest.js` | 788 B | paketlenmemiş kaynak kodu, tek satır |
-| `pack.js` | 1.761 B | üç HTML dosyasını kaynaklardan yeniden üretir ve bayt bayt karşılaştırır |
+| `index.html` | 998 B | oyun, paketlenmiş ve oynanabilir |
+| `chess.js` | 1.126 B | paketlenmemiş kaynak kodu, tek satır |
+| `minimal.html` | 794 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
+| `minimal.js` | 830 B | paketlenmemiş kaynak kodu, tek satır |
+| `Lowest.html` | 712 B | en küçük sürüm, paketlenmiş ve oynanabilir |
+| `Lowest.js` | 756 B | paketlenmemiş kaynak kodu, tek satır |
+| `pack.js` | 1.760 B | üç HTML dosyasını kaynaklardan yeniden üretir ve bayt bayt karşılaştırır |
 
 ## Paketi açma
 
@@ -303,10 +303,10 @@ Döngünün kendisi hiçbir oyun kodu çalıştırmaz, bu yüzden bunu Node'da y
 | seçenek | `index.html` | `minimal.html` | `Lowest.html` |
 | ------- | ------------ | -------------- | ------------- |
 | `reassignVars` | `false` | `false` | `false` |
-| `crushGainFactor` | `1` | `1` | `0` |
-| `crushLengthFactor` | `0.5` | `-0.5` | `0.5` |
-| `crushCopiesFactor` | `1` | `0.75` | `0.5` |
-| `crushTiebreakerFactor` | `0` | `-1` | `0` |
+| `crushGainFactor` | `0.5` | `0.5` | `0.5` |
+| `crushLengthFactor` | `0` | `1` | `1` |
+| `crushCopiesFactor` | `0.25` | `0` | `0` |
+| `crushTiebreakerFactor` | `-1` | `-1` | `-1` |
 | `withMath` | `false` | `false` | `false` |
 | `wrapInSetInterval` | `false` | `false` | `false` |
 | `useES6` | `true` | `true` | `true` |
@@ -315,10 +315,10 @@ Döngünün kendisi hiçbir oyun kodu çalıştırmaz, bu yüzden bunu Node'da y
 
 ```
 41 B  <center><table id=T style=zoom:3><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
-971 B  paketlenmiş yük                              774 B  paketlenmiş yük                     731 B  paketlenmiş yük
+948 B  paketlenmiş yük                              753 B  paketlenmiş yük                     695 B  paketlenmiş yük
  9 B  </script>                                      9 B  </script>                            9 B  </script>
 ----                                                ----                                       ----
-1021 B                                              815 B                                      748 B
+ 998 B                                              794 B                                      712 B
 ```
 
 Yeniden üretmek için:
@@ -331,7 +331,7 @@ node pack.js            # index.html, minimal.html ve Lowest.html dosyalarını 
 
 `regpack` komut satırını kullanıyorsanız `--no-reassignVars` yazın. `--reassignVars false` biçiminde yazılan değer `"false"` metni olarak gelir, doğru sayılır ve değişkenler yeniden adlandırılır.
 
-Yalnızca betik paketlenir; HTML kabuğu paketlenmez. Şunu not edin: kaynağı kısaltmak çıktıyı **güvenilir biçimde kısaltmaz** — paketleyici kazancını tekrar eden alt dizelerden elde eder, bu yüzden daha çok tekrar içeren daha uzun bir kaynak çoğu zaman daha küçük paketlenir. `index.html`'deki bazı düzenlemeler tam da bu nedenle, gerekenden bilerek daha uzun tutulmuştur. `chess.js` üzerinde denenen, davranışı değiştirmeyen yeniden yazımların hiçbiri daha küçük paketlenmedi, ikisi büyüttü, biri altı bayt. Sonradan gelen iki tanesi aynı şeyi iki yönden söylüyor. `j%5==1` yerine `66>>j` yazmak kaynağı bir bayt kısaltıp paketi bir bayt uzatıyor — 1.023'e ancak başka bir crush dörtlüsüyle dönüyor, yukarıdaki tablonun artık `0, 0, 0, 0` olmamasının sebebi bu. `p%2^g` yerine `p&1^g` yazmak kaynakta hiçbir şeye mal olmuyor, çıktıda **iki bayta**, ve hiçbir ayar onu geri almıyor; alınmadı. `minimal.js`'te aynı değişiklik `b[f]%2^t` üzerinde ters yönde işledi ve bir bayt kazandırdı, ondan önce de `o%5==1` → `66>>o` bir bayt kazandırmıştı.
+Yalnızca betik paketlenir; HTML kabuğu paketlenmez. Şunu not edin: kaynağı kısaltmak çıktıyı **güvenilir biçimde kısaltmaz** — paketleyici kazancını tekrar eden alt dizelerden elde eder, bu yüzden daha çok tekrar içeren daha uzun bir kaynak çoğu zaman daha küçük paketlenir. `index.html`'deki bazı düzenlemeler tam da bu nedenle, gerekenden bilerek daha uzun tutulmuştur. `chess.js` üzerinde denenen, davranışı değiştirmeyen yeniden yazımların hiçbiri daha küçük paketlenmedi, ikisi büyüttü, biri altı bayt. Sonradan gelen iki tanesi aynı şeyi iki yönden söylüyor. `j%5==1` yerine `66>>j` yazmak kaynağı bir bayt kısaltıp paketi bir bayt uzatıyor — 1.023'e ancak başka bir crush dörtlüsüyle dönüyor. `p%2^g` yerine `p&1^g` yazmak kaynakta hiçbir şeye mal olmuyor, çıktıda **iki bayta**, ve hiçbir ayar onu geri almıyor; alınmadı. `minimal.js`'te aynı değişiklik `b[f]%2^t` üzerinde ters yönde işledi ve bir bayt kazandırdı, ondan önce de `o%5==1` → `66>>o` bir bayt kazandırmıştı.
 
 `Lowest.js` bunun en açık örneği. Olabildiğince düz yazıldığında betik 787 bayt ve olduğu gibi paketlenince 785 baytlık bir dosya veriyor. Her biri yerine geçtiği şeyden daha uzun ya da onunla aynı uzunlukta üç yeniden yazım bunu 766'ya indiriyor (aşağıda anlatılan turdan önce):
 
@@ -361,7 +361,7 @@ Her yeniden yazım birkaç eşdeğer yazılışla da denendi (`&&S()` ya da `&S(
 | `minimal.html` | 830 | **815** | 824 | 824 | — |
 | `Lowest.html` | 766 | **748** | 756 | 756 | 749 |
 
-`Lowest.js`, rok satırını iki saldırı testi arasında `&&` ile alıyor (`!V(t)&&!V(t,i+k)`): kaynakta bir bayt uzun, pakette bir bayt kısa. `minimal.html` son baytını yalnızca ayardan aldı: negatif bir uzunluk çarpanı ve `-1` tiebreaker; yukarıdaki tabloda sütununun ötekilere benzememesinin sebebi bu.
+`Lowest.js`, rok satırını iki saldırı testi arasında `&&` ile alıyor (`!V()&&!V(i+k)`): kaynakta bir bayt uzun, pakette bir bayt kısa. Paketleme tablosundaki crush dörtlüleri, her dosya için yapılan bir taramada bulunan en iyileri; üçü de `-1` tiebreaker ile bitiyor.
 
 Bu tablodaki boyutlar `style=zoom:3` eklenmeden önceki. O ekleme yükte değil kabukta durduğu için yukarıdaki karşılaştırmaların hiçbirini değiştirmiyor; yalnızca `index.html`'i 1.008'den 1.021'e taşıyor.
 
