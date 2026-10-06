@@ -6,9 +6,9 @@ Two-player chess in bytes. Three builds, each a single HTML file under 1 KB: no 
 
 | file | size | how it plays |
 | ---- | ---- | ------------ |
-| `index.html` | **998 B** | click the board; piece glyphs, board flip, promotion picker, drawn at three times its size |
-| `minimal.html` | **794 B** | click the board; pieces shown as hexadecimal digits |
-| `Lowest.html` | **712 B** | type moves as numbers into a dialog; no board at all |
+| `index.html` | **996 B** | click the board; piece glyphs, board flip, promotion picker, drawn at three times its size |
+| `minimal.html` | **791 B** | click the board; pieces shown as hexadecimal digits |
+| `Lowest.html` | **709 B** | type moves as numbers into a dialog; no board at all |
 
 All three enforce the same rules: full legality, castling with every condition, en passant, promotion to any piece.
 
@@ -19,7 +19,7 @@ Part of the [Golfstack](https://www.fidelite.art/) project.
 - [cuneytinann.github.io/chessinbytes](https://cuneytinann.github.io/chessinbytes/) — `index.html`
 - [cuneytinann.github.io/chessinbytes/minimal.html](https://cuneytinann.github.io/chessinbytes/minimal.html) — `minimal.html`
 - [cuneytinann.github.io/chessinbytes/Lowest.html](https://cuneytinann.github.io/chessinbytes/Lowest.html) — `Lowest.html`
-- [fidelite.art/special/DOM_998.html](https://www.fidelite.art/special/DOM_998.html) — same file as `index.html`, mirrored on the project site under `special`
+- [fidelite.art/special/DOM_996.html](https://www.fidelite.art/special/DOM_996.html) — same file as `index.html`, mirrored on the project site under `special`
 - [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — same file as `minimal.html`
 
 The name of the budget: 1,024 bytes. `index.html` lands 3 bytes under it; the other two stay well below.
@@ -81,12 +81,12 @@ The same rule set with no board at all. The whole interface is one `prompt()` di
 
 | file | size | what |
 | ---- | ---- | ---- |
-| `index.html` | 998 B | the game, packed and playable |
-| `chess.js` | 1,126 B | its plain source, one line, unpacked |
-| `minimal.html` | 794 B | the reduced build, packed and playable |
-| `minimal.js` | 830 B | its plain source, one line, unpacked |
-| `Lowest.html` | 712 B | the smallest build, packed and playable |
-| `Lowest.js` | 756 B | its plain source, one line, unpacked |
+| `index.html` | 996 B | the game, packed and playable |
+| `chess.js` | 1,124 B | its plain source, one line, unpacked |
+| `minimal.html` | 791 B | the reduced build, packed and playable |
+| `minimal.js` | 828 B | its plain source, one line, unpacked |
+| `Lowest.html` | 709 B | the smallest build, packed and playable |
+| `Lowest.js` | 754 B | its plain source, one line, unpacked |
 | `pack.js` | 1,760 B | rebuilds all three HTML files from the sources and checks them byte for byte |
 
 ## Unpacking
@@ -118,10 +118,10 @@ In all three, the winning stage is 2, the regexp character class. Byte layout:
 
 ```
 41 B  <center><table id=T style=zoom:3><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
-948 B  packed payload                               753 B  packed payload                      695 B  packed payload
+946 B  packed payload                               750 B  packed payload                      692 B  packed payload
  9 B  </script>                                      9 B  </script>                            9 B  </script>
 ----                                                ----                                       ----
- 998 B                                              794 B                                      712 B
+ 996 B                                              791 B                                      709 B
 ```
 
 To rebuild:
@@ -170,6 +170,19 @@ The sizes in this table are from before `style=zoom:3` was added. It sits in the
 
 All three were checked against the previous files: perft from the starting position, Kiwipete and CPW position 3, a geometry comparison on random boards, and old and new packed files driven side by side through their real inputs — clicks or `prompt()` answers — with the board, the ghost, the side to move, the castling rights and the rendered output compared after every action.
 
+### October 2026: two more from FideLite
+
+Two rule-side shortenings made in [FideLite](https://github.com/cuneytinann/FideLite) carry over to all three builds. The castling rook's square is now written `f+=k>0||-2` instead of `f+=1.5*k-.5`: `k` is ±1 there, and `true` counts as 1. The double-step test is now `j%6<2` instead of `j%5==1` (`o` in `minimal.js`, `y` in `Lowest.js`): it lets ranks 0, 1, 6 and 7 through, but a pawn never stands on the first or last rank, so only its home ranks remain. In `index.html` one more spelling paid off once packed: `g=b[i]%2` written as `g=b[i]&1`. It is the same length in the source and a byte shorter packed — the very swap that costs two bytes at `p%2^g` saves one here.
+
+| build | before | after | castling only | double step only |
+| ----- | ------ | ----- | ------------- | ---------------- |
+| `index.html` | 998 | **996** | 998 | 997 |
+| `minimal.html` | 794 | **791** | 793 | 792 |
+| `Lowest.html` | 712 | **709** | 711 | 710 |
+
+The crush tuples were searched again over 3,549 settings per file — gain 0 to 3, length −1 to 2, copies 0 to 1.5 in quarter steps, tiebreaker −1, 0 or 1. None beats the tuples in the packing table, so they stay. Each new file unpacks to exactly its new source, and old and new sources were played side by side through random games: at every ply the geometry for every piece, target and threat mode, the legality of every move and the full state — board, ghost, side to move, castling book — were compared, with no difference.
+
+
 ---
 
 ## Deprecated on purpose
@@ -203,9 +216,9 @@ Baytlar içinde iki kişilik satranç. Üç sürüm, her biri 1 KB'nin altında 
 
 | dosya | boyut | nasıl oynanır |
 | ----- | ----- | ------------- |
-| `index.html` | **998 B** | tahtaya tıklanarak; taş karakterleri, tahta çevirme, terfi seçici, üç kat büyük çizilir |
-| `minimal.html` | **794 B** | tahtaya tıklanarak; taşlar onaltılık rakamlarla gösterilir |
-| `Lowest.html` | **712 B** | hamleler bir pencereye sayı olarak yazılır; tahta hiç yok |
+| `index.html` | **996 B** | tahtaya tıklanarak; taş karakterleri, tahta çevirme, terfi seçici, üç kat büyük çizilir |
+| `minimal.html` | **791 B** | tahtaya tıklanarak; taşlar onaltılık rakamlarla gösterilir |
+| `Lowest.html` | **709 B** | hamleler bir pencereye sayı olarak yazılır; tahta hiç yok |
 
 Üçü de aynı kuralları uygular: tam yasallık kontrolü, tüm koşullarıyla rok, geçerken alma, her taşa terfi.
 
@@ -216,7 +229,7 @@ Baytlar içinde iki kişilik satranç. Üç sürüm, her biri 1 KB'nin altında 
 - [cuneytinann.github.io/chessinbytes](https://cuneytinann.github.io/chessinbytes/) — `index.html`
 - [cuneytinann.github.io/chessinbytes/minimal.html](https://cuneytinann.github.io/chessinbytes/minimal.html) — `minimal.html`
 - [cuneytinann.github.io/chessinbytes/Lowest.html](https://cuneytinann.github.io/chessinbytes/Lowest.html) — `Lowest.html`
-- [fidelite.art/special/DOM_998.html](https://www.fidelite.art/special/DOM_998.html) — `index.html` ile aynı dosya, proje sitesinde `special` altında yansıtılmış hâli
+- [fidelite.art/special/DOM_996.html](https://www.fidelite.art/special/DOM_996.html) — `index.html` ile aynı dosya, proje sitesinde `special` altında yansıtılmış hâli
 - [fidelite.art/special/DOM_minimum.html](https://www.fidelite.art/special/DOM_minimum.html) — `minimal.html` ile aynı dosya
 
 Hedeflenen sınır 1.024 bayt. `index.html` onun 3 bayt altında kalıyor; öteki ikisi epey aşağıda.
@@ -278,12 +291,12 @@ Aynı kural seti, tahtasız. Arayüzün tamamı tek bir `prompt()` penceresi.
 
 | dosya | boyut | ne |
 | ----- | ----- | -- |
-| `index.html` | 998 B | oyun, paketlenmiş ve oynanabilir |
-| `chess.js` | 1.126 B | paketlenmemiş kaynak kodu, tek satır |
-| `minimal.html` | 794 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
-| `minimal.js` | 830 B | paketlenmemiş kaynak kodu, tek satır |
-| `Lowest.html` | 712 B | en küçük sürüm, paketlenmiş ve oynanabilir |
-| `Lowest.js` | 756 B | paketlenmemiş kaynak kodu, tek satır |
+| `index.html` | 996 B | oyun, paketlenmiş ve oynanabilir |
+| `chess.js` | 1.124 B | paketlenmemiş kaynak kodu, tek satır |
+| `minimal.html` | 791 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
+| `minimal.js` | 828 B | paketlenmemiş kaynak kodu, tek satır |
+| `Lowest.html` | 709 B | en küçük sürüm, paketlenmiş ve oynanabilir |
+| `Lowest.js` | 754 B | paketlenmemiş kaynak kodu, tek satır |
 | `pack.js` | 1.760 B | üç HTML dosyasını kaynaklardan yeniden üretir ve bayt bayt karşılaştırır |
 
 ## Paketi açma
@@ -315,10 +328,10 @@ Döngünün kendisi hiçbir oyun kodu çalıştırmaz, bu yüzden bunu Node'da y
 
 ```
 41 B  <center><table id=T style=zoom:3><script>     32 B  <input id=p><table id=T><script>     8 B  <script>
-948 B  paketlenmiş yük                              753 B  paketlenmiş yük                     695 B  paketlenmiş yük
+946 B  paketlenmiş yük                              750 B  paketlenmiş yük                     692 B  paketlenmiş yük
  9 B  </script>                                      9 B  </script>                            9 B  </script>
 ----                                                ----                                       ----
- 998 B                                              794 B                                      712 B
+ 996 B                                              791 B                                      709 B
 ```
 
 Yeniden üretmek için:
@@ -366,6 +379,19 @@ Her yeniden yazım birkaç eşdeğer yazılışla da denendi (`&&S()` ya da `&S(
 Bu tablodaki boyutlar `style=zoom:3` eklenmeden önceki. O ekleme yükte değil kabukta durduğu için yukarıdaki karşılaştırmaların hiçbirini değiştirmiyor; yalnızca `index.html`'i 1.008'den 1.021'e taşıyor.
 
 Üçü de önceki dosyalarla karşılaştırılarak doğrulandı: başlangıç pozisyonu, Kiwipete ve CPW 3. pozisyondan perft; rastgele tahtalarda geometri karşılaştırması; eski ve yeni paketli dosyalar gerçek girişleriyle — tıklama ya da `prompt()` cevabı — yan yana sürüldü ve her adımdan sonra tahta, hayalet, sıra, rok hakları ve ekrana basılan çıktı karşılaştırıldı.
+
+### Ekim 2026: FideLite'tan iki kısaltma daha
+
+[FideLite](https://github.com/cuneytinann/FideLite)'ta yapılan kural tarafındaki iki kısaltma üç sürüme de taşındı. Rok kalesinin karesi artık `f+=1.5*k-.5` yerine `f+=k>0||-2` diye yazılıyor: orada `k` ±1, `true` da 1 sayılıyor. Çift adım testi artık `j%5==1` yerine `j%6<2` (`minimal.js`'te `o`, `Lowest.js`'te `y`): 0, 1, 6 ve 7. yatayları geçiriyor, ama piyon birinci ya da son yatayda hiç durmadığı için geriye yalnızca başlangıç yatayları kalıyor. `index.html`'de bir yazılış daha paketlenince kazandırdı: `g=b[i]%2` yerine `g=b[i]&1`. Kaynakta aynı uzunlukta, pakette bir bayt kısa — `p%2^g`'de iki bayta mal olan değişim burada bir bayt kazandırıyor.
+
+| sürüm | önce | sonra | yalnız rok | yalnız çift adım |
+| ----- | ---- | ----- | ---------- | ---------------- |
+| `index.html` | 998 | **996** | 998 | 997 |
+| `minimal.html` | 794 | **791** | 793 | 792 |
+| `Lowest.html` | 712 | **709** | 711 | 710 |
+
+Crush dörtlüleri dosya başına 3.549 ayarla yeniden tarandı — gain 0–3, length −1–2, copies 0–1,5 çeyreklik adımlarla, tiebreaker −1, 0 ya da 1. Hiçbiri paketleme tablosundaki dörtlüleri geçmiyor, o yüzden aynı kalıyorlar. Her yeni dosya açıldığında kendi yeni kaynağının birebir aynısını veriyor; eski ve yeni kaynaklar rastgele oyunlarda yan yana oynatıldı: her yarım hamlede her taş, hedef ve tehdit kipi için geometri, her hamlenin yasallığı ve tam durum — tahta, hayalet, sıra, rok defteri — karşılaştırıldı, hiçbir fark çıkmadı.
+
 
 ---
 
