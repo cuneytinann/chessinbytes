@@ -8,7 +8,7 @@ Two-player chess in bytes. Three builds, each a single HTML file under 1 KB: no 
 | ---- | ---- | ------------ |
 | `index.html` | **911 B** | click the board; piece glyphs, the board turns after every move, promotion picker, drawn at three times its size |
 | `minimal.html` | **722 B** | click the board; pieces shown as hexadecimal digits, promotion piece typed into a box |
-| `Lowest.html` | **654 B** | type moves as numbers into a dialog; no board at all |
+| `Lowest.html` | **650 B** | type moves as numbers into a dialog; no board at all |
 
 All three enforce the same rules: full legality, castling with every condition, en passant, promotion to any piece. They run on the 0x88 rule code of the `L1` builds of [FideLite](https://github.com/cuneytinann/FideLite).
 
@@ -63,13 +63,13 @@ The text box is the cheapest control for the promotion piece. A `<select>` holdi
 
 The same rules, with no board at all. The whole interface is one `prompt()` dialog.
 
-- **No board.** Nothing is drawn. The dialog shows the last accepted move exactly as it was typed, and nothing else. Keeping the position in mind is up to the players.
+- **No board.** Nothing is drawn. The dialog shows the last accepted move exactly as it was typed, and nothing else; before the first move it shows `63`, the value the loop that lays out the board leaves in `j`. Keeping the position in mind is up to the players.
 - **Moves as numbers.** Four digits give the from-square and then the to-square, each written as its rank and then its file, both counted from 0: a1 is `00`, h1 `07`, a8 `70`, h8 `77`. `e2e4` is `1434`. Castling is written as the king's move: `0406` and `0402` for White, `7476` and `7472` for Black. En passant uses the square the pawn actually lands on.
 - **Promotion from a fifth character**, taken modulo 4 as in the box of `minimal.html`: `1` knight, `2` rook, `3` bishop; anything else, or nothing, gives a queen. Characters after the fifth are ignored.
 - **How input is read.** A missing character, or one that is not a digit, counts as `0`. So `1` is read as `1000` (a2 to a1) and is played if that move happens to be legal. `8` and `9` point off the board, so a square written with them never makes a legal move.
 - **Nothing is ever rejected loudly.** A move for the wrong side, an illegal move, an empty line or Cancel: in every case the dialog comes back with the same text.
 - **No ending.** When the side to move has no legal move (checkmate or stalemate), every input is refused and the dialog keeps showing the last move. The loop never exits; close the tab to stop.
-- **Not packed, and no separate source.** The file is the program itself inside a `<script>` element; there is nothing to unpack. At this size packing does not pay for itself. RegPack does find repeats: with 16 tokens its encoded string comes to 589 bytes, 48 fewer than the 637-byte source. But the loop that unpacks it, `for(_='…';G=/[…]/.exec(_);)with(_.split(G))_=join(shift());eval(_)`, costs 67 bytes on its own, so the shortest packed form over all 2,673 settings listed under *Packing*, with 5.0.1 and 5.0.4 alike, is 656 bytes: 19 more than the source. RegPack therefore hands the source back unchanged. In Kolmogorov's terms: a self-extracting file is a description of the program that has to carry its own decoder, and here the plain source is the shorter description.
+- **Not packed, and no separate source.** The file is the program itself inside a `<script>` element; there is nothing to unpack. At this size packing does not pay for itself. RegPack does find repeats: with 16 tokens its encoded string comes to 585 bytes, 48 fewer than the 633-byte source. But the loop that unpacks it, `for(_='…';G=/[…]/.exec(_);)with(_.split(G))_=join(shift());eval(_)`, costs 67 bytes on its own, so the shortest packed form over all 2,673 settings listed under *Packing*, with 5.0.1 and 5.0.4 alike, is 652 bytes: 19 more than the source. RegPack therefore hands the source back unchanged. In Kolmogorov's terms: a self-extracting file is a description of the program that has to carry its own decoder, and here the plain source is the shorter description.
 
 ---
 
@@ -81,7 +81,7 @@ The same rules, with no board at all. The whole interface is one `prompt()` dial
 | `chess.js` | 1,099 B | its plain source, one line, unpacked |
 | `minimal.html` | 722 B | the reduced build, packed and playable |
 | `minimal.js` | 760 B | its plain source, one line, unpacked |
-| `Lowest.html` | 654 B | the smallest build: the source itself, in a `<script>` element |
+| `Lowest.html` | 650 B | the smallest build: the source itself, in a `<script>` element |
 | `pack.js` | 1,728 B | rebuilds both packed files from their sources and checks them byte for byte |
 
 ## The engine
@@ -134,10 +134,10 @@ In both files the winning stage is stage 2, the regexp character class. Byte lay
 
 ```
 41 B  <center><table id=u style=zoom:3><script>     32 B  <input id=x><table id=u><script>     8 B  <script>
-861 B  packed payload                               681 B  packed payload                      637 B  source, not packed
+861 B  packed payload                               681 B  packed payload                      633 B  source, not packed
  9 B  </script>                                      9 B  </script>                            9 B  </script>
 ----                                                ----                                       ----
- 911 B                                              722 B                                      654 B
+ 911 B                                              722 B                                      650 B
 ```
 
 To rebuild:
@@ -175,6 +175,7 @@ A shorter source does not reliably pack shorter, because the packer pays for rep
 - **Perft from the starting position** on the engine of each of the three files gives 20, 400, 8,902, 197,281 and 4,865,609 (depth 1–5), the published values.
 - **Every file was driven through its real inputs:** cell click handlers, the promotion row, the text box and `prompt()` answers, both in Node and in Chromium. At every ply the set of moves the interface accepts was compared with an independent reference move generator.
 - **The positions covered** were 402 targeted ones and several hundred random games. The targeted positions include castling through, into and out of check; castling rights already lost; en passant, including an expired one and a pinned one; promotions, including captures and underpromotions; and checkmate and stalemate. Not one move differed.
+- **The 650-byte `Lowest.html`** was checked against the 654-byte one through its `prompt()`: 20 games, 1,513 answers, 1,258 of them legal moves, with empty lines, Cancel and junk among them. The board, the side to move, the en passant square and the touched-squares ledger never differed; the dialog text differed only before the first move, `63` instead of an empty line.
 - **The October 2026 update** was checked against the files before it, through their real inputs, with castling, en passant and promotion favoured: `Lowest.html` 120 games and 24,890 `prompt()` answers, empty lines, Cancel, junk and fifth characters among them; `index.html` 60 games and 12,335 clicks on cells and promotion buttons; `minimal.html` 60 games and 13,376 clicks, with the text box set to a new value before each. After every input the dialog text or the drawn table, the board and the touched-squares ledger were compared: no difference. Perft from the starting position to depth 4 gives 197,281 on all three engines. `node pack.js --check` rebuilds all three files byte for byte, with RegPack 5.0.1 and 5.0.4 alike.
 
 ---
@@ -197,6 +198,8 @@ There is no doctype either, which puts the page in **quirks mode**, deliberately
 ---
 
 ## The previous version
+
+**October 2026, third pass:** `Lowest.html` 650 bytes, down from 654. The dialog's text no longer has a variable of its own: `j`, which the loop laying out the board already leaves behind, holds the last accepted move, so `for(y='';;` becomes `for(;;`. Rules and moves are unchanged; the one visible difference is that before the first move the dialog shows `63`, the last index of the start string, instead of an empty line.
 
 **October 2026, second pass:** 911, 722 and 654 bytes, down from 924, 740 and 665. Rules, input and output are unchanged; the bytes come from the rule optimizations of FideLite's new engine, as far as each pays in its own file, and from the name search described under *Packing*. All three close the pawn branch with `?…:0` and `>b[f]` instead of `&&(…)` and `&!b[f]`. All three now make the rook hop from `U`'s return value, `d-8?d-1024?8:Q:U(r,Q)`. Only `Lowest.html` lays out the starting position with `for(j in s=…)` instead of a `.map()` and writes the castling test as `…?0:S()` instead of `!(…)&S()`: in the packed files both cost bytes, because `.map((p,` and `!(` are repeats the packer was already compressing. In `Lowest.html` and `minimal.html` the `+3` that turns the promotion digit into a piece code moved from the driver into `U`: `p+3|t` there and `k&3` in the call (`x.value&3` in `minimal.html`), instead of `p|t` and `(k&3)+3`. In `index.html` the legality test copies the board as `b=[...q=b]` instead of `q=b,b=[...b]`. `Lowest.html` also lost two bytes in its driver: the move is played in the update clause of the `for`, which saves a comma, and the mover's-piece test reads `b[i]&8^t||…` instead of `…&&~b[i]&8^t&&…`.
 
@@ -223,7 +226,7 @@ Baytlar içinde iki kişilik satranç. Üç sürüm, her biri 1 KB'nin altında 
 | ----- | ----- | ------------- |
 | `index.html` | **911 B** | tahtaya tıklanarak; taş karakterleri, tahta her hamleden sonra döner, terfi seçici, üç kat büyük çizilir |
 | `minimal.html` | **722 B** | tahtaya tıklanarak; taşlar onaltılık rakamlarla gösterilir, terfi taşı bir kutuya yazılır |
-| `Lowest.html` | **654 B** | hamleler bir pencereye sayı olarak yazılır; tahta hiç yok |
+| `Lowest.html` | **650 B** | hamleler bir pencereye sayı olarak yazılır; tahta hiç yok |
 
 Üçü de aynı kuralları uygular: tam yasallık kontrolü, tüm koşullarıyla rok, geçerken alma, her taşa terfi. Üçü de [FideLite](https://github.com/cuneytinann/FideLite)'ın `L1` sürümlerinin 0x88 kural koduyla çalışır.
 
@@ -278,13 +281,13 @@ Terfi taşı için en ucuz denetim metin kutusu. Dört kodu tutan bir `<select>`
 
 Aynı kurallar, tahtasız. Arayüzün tamamı tek bir `prompt()` penceresi.
 
-- **Tahta yok.** Hiçbir şey çizilmez. Pencere son kabul edilen hamleyi yazıldığı gibi gösterir, başka bir şey göstermez. Pozisyonu akılda tutmak oyunculara kalır.
+- **Tahta yok.** Hiçbir şey çizilmez. Pencere son kabul edilen hamleyi yazıldığı gibi gösterir, başka bir şey göstermez; ilk hamleden önce, tahtayı yerleştiren döngünün `j`'de bıraktığı `63`'ü gösterir. Pozisyonu akılda tutmak oyunculara kalır.
 - **Hamleler sayıyla.** Dört rakam önce çıkış karesini, sonra varış karesini verir. Her kare önce yatay, sonra dikey olarak yazılır, ikisi de 0'dan sayılır: a1 `00`, h1 `07`, a8 `70`, h8 `77`. `e2e4`, `1434` olur. Rok şahın hamlesiyle yazılır: beyaz için `0406` ve `0402`, siyah için `7476` ve `7472`. Geçerken almada piyonun gerçekten vardığı kare yazılır.
 - **Terfi beşinci karakterden**, `minimal.html`'in kutusundaki gibi 4'e bölümünden kalanla okunur: `1` at, `2` kale, `3` fil; başka herhangi bir şey ya da hiçbir şey vezir verir. Beşinci karakterden sonrası yok sayılır.
 - **Girdi nasıl okunur.** Eksik bir karakter ya da rakam olmayan bir karakter `0` sayılır. Bu yüzden `1`, `1000` (a2'den a1'e) diye okunur ve o hamle yasalsa oynanır. `8` ile `9` tahtanın dışını gösterir; bu rakamlarla yazılan bir kareden yasal hamle çıkmaz.
 - **Hiçbir şey sesli reddedilmez.** Yanlış tarafın hamlesi, kurala aykırı bir hamle, boş satır ya da İptal: her durumda pencere aynı metinle geri gelir.
 - **Bitiş yok.** Sırası gelen tarafın yasal hamlesi kalmadığında, yani mat ya da patta, her girdi reddedilir ve pencere son hamleyi göstermeye devam eder. Döngü hiç sona ermez; durdurmak için sekmeyi kapatın.
-- **Paketlenmemiş, ayrı bir kaynağı da yok.** Dosya, bir `<script>` öğesinin içindeki programın kendisi; açılacak bir şey yok. Bu boyda paketleme kendini ödemiyor. RegPack tekrarları buluyor: 16 tokenle kodlanmış dizesi 589 bayt, 637 baytlık kaynaktan 48 bayt kısa. Ama onu açan döngü, `for(_='…';G=/[…]/.exec(_);)with(_.split(G))_=join(shift());eval(_)`, tek başına 67 bayt tutuyor; bu yüzden *Paketleme* bölümünde sayılan 2.673 ayarın hepsinde, 5.0.1'de de 5.0.4'te de, paketlenmiş en kısa hâl 656 bayt: kaynaktan 19 bayt uzun. RegPack da kaynağı olduğu gibi geri veriyor. Kolmogorov'un diliyle: kendini açan dosya, programın kendi çözücüsünü de taşımak zorunda olan bir tarifi; burada daha kısa tarif düz kaynağın kendisi.
+- **Paketlenmemiş, ayrı bir kaynağı da yok.** Dosya, bir `<script>` öğesinin içindeki programın kendisi; açılacak bir şey yok. Bu boyda paketleme kendini ödemiyor. RegPack tekrarları buluyor: 16 tokenle kodlanmış dizesi 585 bayt, 633 baytlık kaynaktan 48 bayt kısa. Ama onu açan döngü, `for(_='…';G=/[…]/.exec(_);)with(_.split(G))_=join(shift());eval(_)`, tek başına 67 bayt tutuyor; bu yüzden *Paketleme* bölümünde sayılan 2.673 ayarın hepsinde, 5.0.1'de de 5.0.4'te de, paketlenmiş en kısa hâl 652 bayt: kaynaktan 19 bayt uzun. RegPack da kaynağı olduğu gibi geri veriyor. Kolmogorov'un diliyle: kendini açan dosya, programın kendi çözücüsünü de taşımak zorunda olan bir tarifi; burada daha kısa tarif düz kaynağın kendisi.
 
 ---
 
@@ -296,7 +299,7 @@ Aynı kurallar, tahtasız. Arayüzün tamamı tek bir `prompt()` penceresi.
 | `chess.js` | 1.099 B | paketlenmemiş kaynak kodu, tek satır |
 | `minimal.html` | 722 B | sadeleştirilmiş sürüm, paketlenmiş ve oynanabilir |
 | `minimal.js` | 760 B | paketlenmemiş kaynak kodu, tek satır |
-| `Lowest.html` | 654 B | en küçük sürüm: kaynağın kendisi, bir `<script>` öğesinde |
+| `Lowest.html` | 650 B | en küçük sürüm: kaynağın kendisi, bir `<script>` öğesinde |
 | `pack.js` | 1.728 B | iki paketli dosyayı kaynaklarından yeniden üretir ve bayt bayt karşılaştırır |
 
 ## Motor
@@ -349,10 +352,10 @@ Döngünün kendisi hiçbir oyun kodu çalıştırmaz, bu yüzden bunu Node'da y
 
 ```
 41 B  <center><table id=u style=zoom:3><script>     32 B  <input id=x><table id=u><script>     8 B  <script>
-861 B  paketlenmiş yük                              681 B  paketlenmiş yük                     637 B  kaynak, paketsiz
+861 B  paketlenmiş yük                              681 B  paketlenmiş yük                     633 B  kaynak, paketsiz
  9 B  </script>                                      9 B  </script>                            9 B  </script>
 ----                                                ----                                       ----
- 911 B                                              722 B                                      654 B
+ 911 B                                              722 B                                      650 B
 ```
 
 Yeniden üretmek için:
@@ -390,6 +393,7 @@ Kaynağı kısaltmak paketi güvenilir biçimde kısaltmaz, çünkü paketleyici
 - **Başlangıç pozisyonundan perft**, üç dosyanın motorunda da yayımlanmış değerleri veriyor: 20, 400, 8.902, 197.281 ve 4.865.609 (derinlik 1–5).
 - **Her dosya gerçek girişleriyle sürüldü:** kare tıklama işleyicileri, terfi satırı, metin kutusu ve `prompt()` cevapları, hem Node'da hem Chromium'da. Her yarım hamlede arayüzün kabul ettiği hamle kümesi bağımsız bir referans hamle üreticisiyle karşılaştırıldı.
 - **Kapsanan pozisyonlar** 402 hedefli pozisyon ve birkaç yüz rastgele oyun. Hedefli pozisyonlar arasında şahı şah altından geçiren, şah altına sokan ve şah altındayken yapılan roklar; daha önce kaybedilmiş rok hakları; süresi geçmiş ve açmaza düşmüş olanlar dahil geçerken almalar; alışlı terfiler ve alt terfiler dahil terfiler; mat ve pat var. Tek bir hamle bile farklı çıkmadı.
+- **650 baytlık `Lowest.html`** 654 baytlık sürümle kendi `prompt()`'u üzerinden karşılaştırıldı: 20 oyun, aralarında boş satır, İptal ve anlamsız girdi bulunan 1.513 cevap, bunların 1.258'i yasal hamle. Tahta, sıradaki taraf, geçerken alma karesi ve dokunulan kareler defteri hiç ayrışmadı; pencere metni yalnız ilk hamleden önce farklıydı, boş satır yerine `63`.
 - **Ekim 2026 güncellemesi** önceki dosyalarla, kendi gerçek girişleri üzerinden, rok, geçerken alma ve terfi öne çıkarılarak karşılaştırıldı: `Lowest.html` 120 oyun ve aralarında boş satır, İptal, anlamsız girdi ve beşinci karakter bulunan 24.890 `prompt()` cevabı; `index.html` 60 oyun ve karelere ve terfi düğmelerine 12.335 tıklama; `minimal.html` 60 oyun ve her birinden önce metin kutusuna yeni bir değer yazılarak 13.376 tıklama. Her girdiden sonra pencere metni ya da çizilen tablo, tahta ve dokunulan kareler defteri karşılaştırıldı: fark yok. Başlangıç pozisyonundan 4. derinliğe perft üç motorda da 197.281 veriyor. `node pack.js --check` üç dosyayı da bayt bayt yeniden kuruyor; RegPack 5.0.1 ile 5.0.4 aynı sonucu veriyor.
 
 ---
@@ -412,6 +416,8 @@ Tabloya ve metin kutusuna betikten ulaşmak için `id=u` ve `id=x` yeterlidir; t
 ---
 
 ## Önceki sürüm
+
+**Ekim 2026, üçüncü geçiş:** `Lowest.html` 654 bayttan 650 bayta. Pencerenin metni artık kendi değişkeninde tutulmuyor: son kabul edilen hamleyi, tahtayı yerleştiren döngünün zaten geride bıraktığı `j` tutuyor; böylece `for(y='';;` `for(;;` oluyor. Kurallar ve hamleler aynı; görünen tek fark, ilk hamleden önce pencerenin boş satır yerine başlangıç dizesinin son indisi olan `63`'ü göstermesi.
 
 **Ekim 2026, ikinci geçiş:** 924, 740 ve 665 bayttan 911, 722 ve 654 bayta. Kurallar, girdi ve çıktı aynı; baytlar FideLite'ın yeni motorunun kural optimizasyonlarından, her birinin kendi dosyasında kazandırdığı ölçüde, ve *Paketleme* bölümünde anlatılan ad aramasından geliyor. Üçü de piyon dalını `&&(…)` ve `&!b[f]` yerine `?…:0` ve `>b[f]` ile kapatıyor. Kale sıçraması üçünde de artık `U`'nun dönüş değerinde duruyor: `d-8?d-1024?8:Q:U(r,Q)`. Başlangıç konumunu `.map()` yerine `for(j in s=…)` ile yerleştirmek ve rok testini `!(…)&S()` yerine `…?0:S()` diye yazmak yalnız `Lowest.html`'de var: paketli dosyalarda ikisi de bayta mal oluyor, çünkü `.map((p,` ile `!(` paketleyicinin zaten sıkıştırdığı tekrarlar. `Lowest.html` ve `minimal.html`'de terfi rakamını taş koduna çeviren `+3` sürücüden `U`'ya taşındı: `(k&3)+3` ve `p|t` yerine çağrıda `k&3` (`minimal.html`'de `x.value&3`), orada `p+3|t`. `index.html`'de yasallık testi tahtayı `q=b,b=[...b]` yerine `b=[...q=b]` diye kopyalıyor. `Lowest.html` sürücüsünde de iki bayt kaybetti: hamle `for`'un güncelleme kısmında oynanıyor, bu bir virgülü düşürüyor; hamleyi yapanın taşı testi de `…&&~b[i]&8^t&&…` yerine `b[i]&8^t||…` diye okunuyor.
 
